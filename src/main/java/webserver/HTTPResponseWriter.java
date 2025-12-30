@@ -6,7 +6,6 @@ import java.io.IOException;
 public class HTTPResponseWriter {
     public void addResponseBody(DataOutputStream dos, byte[] body) throws IOException {
         dos.write(body, 0, body.length);
-        dos.flush();
     }
 
     public void addResponseHeader(DataOutputStream dos,
