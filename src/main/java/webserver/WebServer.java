@@ -33,7 +33,7 @@ public class WebServer {
                     0L,
                     TimeUnit.MILLISECONDS,
                     new ArrayBlockingQueue<>(QUEUE_SIZE),
-                    new ThreadPoolExecutor.AbortPolicy()
+                    new ThreadPoolExecutor.AbortPolicy() // 서버가 더 이상 요청을 받을 수 없을 때 즉시 실패로 알림
             );
 
             // 클라이언트가 연결될때까지 대기한다.
