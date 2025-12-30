@@ -2,12 +2,23 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+    private static final HTTPRequestParser httpRequestParser = new HTTPRequestParser();
+    private static final HTTPResponseWriter httpResponseWriter = new HTTPResponseWriter();
+    private static final String baseResourcePath = "./src/main/resources/static";
+
+    private static final Map<Integer, String> STATUS_MESSAGES = Map.of(
+            200, "OK",
+            404, "Not Found",
+            500, "Internal Server Error"
+    );
+
 
     private Socket connection;
 
@@ -19,38 +30,69 @@ public class RequestHandler implements Runnable {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
-        try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream();
-             BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
-            String requestLine = br.readLine();
-            logger.debug("Received request : {}", requestLine);
-
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
+        try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "<h1>Hello World</h1>".getBytes();
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+
+            // 1. request 파싱 & print headers
+            HTTPRequest httpRequest = httpRequestParser.parse(in);
+            httpRequest.printRequestHeaders();
+
+            // 2. 요청 처리
+            byte[] body;
+            HTTPResponse httpResponse;
+            try { // 200 - 정상 처리
+                body = readFile(httpRequest.getPath());
+                String contentType = httpRequest.getContentType();
+                httpResponse = new HTTPResponse(200, contentType, body);
+
+            } catch (FileNotFoundException e) { // 404 - 파일 존재 x
+                body = "<h1>404 Not Found</h1>".getBytes();
+                httpResponse = new HTTPResponse(404, body);
+
+            } catch (IOException e) { // 500 - 서버 오류
+                body = "<h1>500 Internal Server Error</h1>".getBytes();
+                httpResponse = new HTTPResponse(500, body);
+            }
+
+            // 3. response 생성 & send
+            String version = httpRequest.getVersion();
+            int statusCode = httpResponse.getStatusCode();
+            String statusMessage = STATUS_MESSAGES.get(statusCode);
+            String contentType = httpResponse.getContentType();
+
+            httpResponseWriter.addResponseHeader(dos, version, statusCode, statusMessage, contentType, body.length);
+            httpResponseWriter.addResponseBody(dos, body);
+
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
+    private byte[] readFile(String path) throws IOException {
+        // 기본 페이지는 index.html
+        if ("/".equals(path)) {
+            path = "/index.html";
         }
-    }
 
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
+        File file = new File(baseResourcePath + path);
+
+        // 파일이 존재하지 않는 경우
+        if (!file.exists() || !file.isFile()) {
+            throw new FileNotFoundException(file.getPath());
+        }
+
+        String resourcePath = baseResourcePath + path;
+
+        try (InputStream is = new FileInputStream(resourcePath)) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+
+            int read;
+            while ((read = is.read(buffer)) != -1) {
+                baos.write(buffer, 0, read);
+            }
+
+            return baos.toByteArray();
         }
     }
 }
