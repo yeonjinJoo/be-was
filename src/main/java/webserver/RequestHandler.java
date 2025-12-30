@@ -11,7 +11,7 @@ public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private static final HTTPRequestParser httpRequestParser = new HTTPRequestParser();
     private static final HTTPResponseWriter httpResponseWriter = new HTTPResponseWriter();
-    private static final String basicResourcePath = "static";
+    private static final String baseResourcePath = "./src/main/resources/static";
 
     private static final Map<Integer, String> STATUS_MESSAGES = Map.of(
             200, "OK",
@@ -41,7 +41,7 @@ public class RequestHandler implements Runnable {
             byte[] body;
             HTTPResponse httpResponse;
             try { // 200 - 정상 처리
-                body = readStaticFile(httpRequest.getPath());
+                body = readFile(httpRequest.getPath());
                 String contentType = httpRequest.getContentType();
                 httpResponse = new HTTPResponse(200, contentType, body);
 
@@ -68,24 +68,22 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private byte[] readStaticFile(String path) throws IOException {
+    private byte[] readFile(String path) throws IOException {
         // 기본 페이지는 index.html
         if ("/".equals(path)) {
             path = "/index.html";
         }
 
-        String resourcePath = basicResourcePath + path;
+        File file = new File(baseResourcePath + path);
 
-        // ClassLoader 사용해 resource find
-        try (InputStream is = getClass()
-                .getClassLoader()
-                .getResourceAsStream(resourcePath)) {
+        // 파일이 존재하지 않는 경우
+        if (!file.exists() || !file.isFile()) {
+            throw new FileNotFoundException(file.getPath());
+        }
 
-            // 파일이 존재하지 않는 경우
-            if (is == null) {
-                throw new FileNotFoundException(resourcePath);
-            }
+        String resourcePath = baseResourcePath + path;
 
+        try (InputStream is = new FileInputStream(resourcePath)) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
 
