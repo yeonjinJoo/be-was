@@ -35,7 +35,7 @@ public class RequestHandler implements Runnable {
 
             // 1. request 파싱 & print headers
             HTTPRequest httpRequest = httpRequestParser.parse(in);
-            httpRequest.printRequestHeaders();
+            logRequestHeaders(httpRequest);
 
             // 2. 요청 처리
             byte[] body;
@@ -67,6 +67,18 @@ public class RequestHandler implements Runnable {
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private void logRequestHeaders(HTTPRequest request){
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n------------\n");
+        String[] tokens = request.getHeaders().split("\r\n");
+        for (String token : tokens) {
+            sb.append(token + "\n");
+        }
+        sb.append("------------\n");
+
+        logger.debug(sb.toString());
     }
 
     private byte[] readFile(String path) throws IOException {

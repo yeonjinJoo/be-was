@@ -18,8 +18,8 @@ public class HTTPRequestParser {
         String path = tokens[1];
         String version = tokens[2];
 
-        // 브라우저는 HTTP 요청을 보내고 connection을 끊지 않는다.
-        // HTTP 요청 헤더는 빈 줄로 종료되며, 연결이 유지되는 경우 readLine()은 null을 반환하지 않기 때문에
+        // HTTP/1.1 HTTP 요청을 한 번 보내고 connection이 종료되지 않고 유지된다.
+        // 한 번의 HTTP 요청 헤더는 빈 줄로 종료되며, 연결이 유지되는 경우 readLine()은 null을 반환하지 않기 때문에
         // 빈 줄을 기준으로 헤더 읽기를 종료해야 한다.
         String line;
         while ((line = br.readLine()) != null && !line.isEmpty()) {
