@@ -31,14 +31,6 @@ public class HTTPRequest {
         return version;
     }
 
-    public void printRequestHeaders() {
-        String[] tokens = headers.split("\r\n");
-        for (String token : tokens) {
-            System.out.println(token);
-        }
-        System.out.println();
-    }
-
     public String getContentType() {
         if (path.endsWith(".html") || path.endsWith("/")) return "text/html;charset=utf-8";
         if (path.endsWith(".css")) return "text/css";
