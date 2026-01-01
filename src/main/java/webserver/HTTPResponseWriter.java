@@ -10,13 +10,10 @@ public class HTTPResponseWriter {
 
     public void addResponseHeader(DataOutputStream dos,
                                String version,
-                               int statusCode,
-                               String statusMessage,
-                               String contentType,
-                               int lengthOfBodyContent) throws IOException {
-        dos.writeBytes(version + " " + statusCode + " " + statusMessage + "\r\n");
-        dos.writeBytes("Content-Type: "+  contentType + "\r\n");
-        dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+                               HTTPResponse httpResponse) throws IOException {
+        dos.writeBytes(version + " " + httpResponse.getStatusCode() + " " + httpResponse.getStatusMessage() + "\r\n");
+        dos.writeBytes("Content-Type: "+  httpResponse.getContentType() + "\r\n");
+        dos.writeBytes("Content-Length: " + httpResponse.getBody().length + "\r\n");
         dos.writeBytes("\r\n");
     }
 }

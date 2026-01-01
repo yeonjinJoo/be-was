@@ -37,15 +37,4 @@ public class HTTPRequest {
     public String getVersion() {
         return version;
     }
-
-    public String getContentType() {
-        if (path.endsWith(".html") || path.endsWith("/")) return "text/html;charset=utf-8";
-        if (path.endsWith(".css")) return "text/css";
-        if (path.endsWith(".js")) return "application/javascript";
-        if (path.endsWith(".ico")) return "image/x-icon";
-        if (path.endsWith(".svg")) return "image/svg+xml";
-        if (path.endsWith(".png")) return "image/png";
-        if (path.endsWith(".jpg") || path.endsWith(".jpeg")) return "image/jpeg";
-        return "application/octet-stream"; // 알 수 없는 확장자로, 다운로드 처리
-    }
 }
