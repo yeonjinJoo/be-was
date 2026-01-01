@@ -4,14 +4,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 
 public class HTTPRequestParser {
-    public HTTPRequest parse(InputStream in) throws IOException {
+    public HTTPRequest parse(BufferedReader br) throws IOException {
         StringBuilder sb = new StringBuilder(); // for headers
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+        HashMap<String, String> headers = new HashMap<>();
 
         // requestLine 처리
-        String requestLine = br.readLine();
+        String requestLine;
+        if((requestLine = br.readLine()) == null){
+            return null;
+        }
         sb.append(requestLine + "\r\n");
         String[] tokens = requestLine.split(" ");
         String method = tokens[0];
@@ -23,10 +27,16 @@ public class HTTPRequestParser {
         // 빈 줄을 기준으로 헤더 읽기를 종료해야 한다.
         String line;
         while ((line = br.readLine()) != null && !line.isEmpty()) {
-            sb.append(line + "\r\n");
+            int idx = line.indexOf(":");
+            if (idx > 0) {
+                String key = line.substring(0, idx).trim();
+                String value = line.substring(idx + 1).trim();
+                headers.put(key, value);
+            }
+            sb.append(line).append("\r\n");
         }
-        String headers = sb.toString();
 
-        return new HTTPRequest(method, path, headers, version);
+        String rawHeaders = sb.toString();
+        return new HTTPRequest(method, path, headers, rawHeaders, version);
     }
 }
