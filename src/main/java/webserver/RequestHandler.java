@@ -4,10 +4,13 @@ import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.http.HTTPRequest;
+import webserver.http.HTTPRequestParser;
+import webserver.http.HTTPResponse;
+import webserver.http.HTTPResponseWriter;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -63,7 +66,7 @@ public class RequestHandler implements Runnable {
                 logRequestHeaders(httpRequest);
 
                 // 3. 요청 처리
-                HTTPResponse httpResponse = ApiHandler.handle(httpRequest);
+                HTTPResponse httpResponse = Router.handle(httpRequest);
 
                 // 3. response 생성 & send
                 httpResponseWriter.addResponseHeader(dos, httpRequest.getVersion(), httpResponse);

@@ -1,8 +1,10 @@
 package webserver;
 
+import webserver.http.HTTPResponse;
+
 import java.io.*;
 
-public class StaticFileHandler {
+public class StaticFileServer {
     private static final String baseResourcePath = "./src/main/resources/static";
 
     public static HTTPResponse serve(String path) {

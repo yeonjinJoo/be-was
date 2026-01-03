@@ -1,6 +1,9 @@
 package webserver;
 
-public class ApiHandler {
+import webserver.http.HTTPRequest;
+import webserver.http.HTTPResponse;
+
+public class Router {
 
     public static HTTPResponse handle(HTTPRequest request) {
         return switch (request.getMethod()){
@@ -15,13 +18,13 @@ public class ApiHandler {
         String resourcePath = path;
 
         if(path.equals("/")){
-            return StaticFileHandler.serve("/index.html");
+            return StaticFileServer.serve("/index.html");
         }
 
         if(path.equals("/registration")){
             resourcePath += "/index.html";
         }
 
-        return StaticFileHandler.serve(resourcePath);
+        return StaticFileServer.serve(resourcePath);
     }
 }
