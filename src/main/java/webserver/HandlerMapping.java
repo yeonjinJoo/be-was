@@ -31,15 +31,12 @@ public class HandlerMapping {
     private static String extractTopLevelPath(String path) {
         if (path == null || path.isEmpty()) return "/";
 
-        // query 제거
-        int q = path.indexOf('?');
-        if (q != -1) path = path.substring(0, q);
-
         if (!path.startsWith("/")) path = "/" + path;
 
         if ("/".equals(path)) return "/";
 
         int secondSlash = path.indexOf('/', 1);
+
         return (secondSlash == -1) ? path : path.substring(0, secondSlash);
     }
 }

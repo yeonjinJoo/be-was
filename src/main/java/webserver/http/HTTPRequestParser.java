@@ -14,11 +14,27 @@ public class HTTPRequestParser {
         if((requestLine = br.readLine()) == null){
             return null;
         }
+
         sb.append(requestLine + "\r\n");
         String[] tokens = requestLine.split(" ");
+        if(tokens.length != 3){
+            throw new IllegalArgumentException("Invalid request line");
+        }
+
         String method = tokens[0];
-        String path = tokens[1];
+        String requestTarget = tokens[1];
         String version = tokens[2];
+
+        String path;
+        HashMap<String, String> queryParams;
+        int q = requestTarget.indexOf('?');
+        if(q >= 0){
+            path = requestTarget.substring(0, q);
+            queryParams = parseQueryString(requestTarget.substring(q + 1));
+        } else{
+            path = requestTarget;
+            queryParams = null;
+        }
 
         // HTTP/1.1 HTTP 요청을 한 번 보내고 connection이 종료되지 않고 유지된다.
         // 한 번의 HTTP 요청 헤더는 빈 줄로 종료되며, 연결이 유지되는 경우 readLine()은 null을 반환하지 않기 때문에
@@ -35,6 +51,33 @@ public class HTTPRequestParser {
         }
 
         String rawHeaders = sb.toString();
-        return new HTTPRequest(method, path, headers, rawHeaders, version);
+        return new HTTPRequest(method, path, queryParams, headers, rawHeaders, version);
     }
+
+    private HashMap<String, String> parseQueryString(String queryString){
+        if(queryString.isEmpty()){
+            return null;
+        }
+
+        HashMap<String, String> query = new HashMap<>();
+        for (String pair : queryString.split("&")) {
+            if (pair.isEmpty()) continue;
+
+            int eq = pair.indexOf('=');
+            if (eq < 0) {
+                query.put(urlDecode(pair), "");
+            } else {
+                query.put(
+                        urlDecode(pair.substring(0, eq)),
+                        urlDecode(pair.substring(eq + 1))
+                );
+            }
+        }
+        return query;
+    }
+
+    private String urlDecode(String s) {
+        return java.net.URLDecoder.decode(s, java.nio.charset.StandardCharsets.UTF_8);
+    }
+
 }

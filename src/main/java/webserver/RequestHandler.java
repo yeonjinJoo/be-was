@@ -75,10 +75,13 @@ public class RequestHandler implements Runnable {
 
                 requestCount++;
             } catch (SocketTimeoutException e){ // connection 타임아웃
-                logger.debug("Socket timeout. Closing connection: {}. Handled {} requests on this connection.", e.getMessage(), requestCount);
+                logger.debug("Socket timeout : Closing connection: {}. Handled {} requests on this connection.", e.getMessage(), requestCount);
                 break;
             } catch (SocketException e){ // connection 오류
-                logger.debug("Client disconnected unexpectedly: {}. Handled {} requests on this connection.", e.getMessage(), requestCount);
+                logger.debug("Socket disconnected unexpectedly : {}. Handled {} requests on this connection.", e.getMessage(), requestCount);
+                break;
+            } catch (IllegalArgumentException e) {
+                logger.debug("Invalid argument : {}." + e.getMessage());
                 break;
             }
         }
