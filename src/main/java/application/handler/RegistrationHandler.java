@@ -9,12 +9,14 @@ public class RegistrationHandler implements Handler{
     @Override
     public HTTPResponse handle(HTTPRequest request) {
         String path = request.getPath();
+        String method = request.getMethod();
 
         if(path.equals("/registration")){
-            return StaticFileServer.serve(path + "/index.html");
+            switch (method) {
+                case "GET": return StaticFileServer.serve(path + "/index.html");
+            }
         }
 
-        HTTPStatus httpStatus = HTTPStatus.METHOD_NOT_ALLOWED;
-        return new HTTPResponse(httpStatus.code(), httpStatus.meesage(), httpStatus.byteMessage());
+        return HTTPResponse.methodNotAllowed();
     }
 }

@@ -66,7 +66,7 @@ public class RequestHandler implements Runnable {
                 logRequestHeaders(httpRequest);
 
                 // 3. 요청 처리
-                HTTPResponse httpResponse = Router.handle(httpRequest);
+                HTTPResponse httpResponse = Router.route(httpRequest);
 
                 // 3. response 생성 & send
                 httpResponseWriter.addResponseHeader(dos, httpRequest.getVersion(), httpResponse);
