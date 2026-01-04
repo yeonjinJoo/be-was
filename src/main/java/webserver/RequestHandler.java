@@ -4,16 +4,19 @@ import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.http.HTTPRequest;
+import webserver.http.HTTPRequestParser;
+import webserver.http.HTTPResponse;
+import webserver.http.HTTPResponseWriter;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private static final HTTPRequestParser httpRequestParser = new HTTPRequestParser();
     private static final HTTPResponseWriter httpResponseWriter = new HTTPResponseWriter();
-    private static final int CONNECTION_TIMEOUT = 10000; // Tomcat 기본 설정 (20s)
+    private static final int CONNECTION_TIMEOUT = 20000; // Tomcat 기본 설정 (20s)
 
     private Socket connection;
 
@@ -63,19 +66,21 @@ public class RequestHandler implements Runnable {
                 logRequestHeaders(httpRequest);
 
                 // 3. 요청 처리
-                HTTPResponse httpResponse = ApiHandler.handle(httpRequest);
+                HTTPResponse httpResponse = Router.route(httpRequest);
 
                 // 3. response 생성 & send
-                httpResponseWriter.addResponseHeader(dos, httpRequest.getVersion(), httpResponse);
-                httpResponseWriter.addResponseBody(dos, httpResponse.getBody());
+                httpResponseWriter.write(dos, httpRequest.getVersion(), httpResponse);
                 dos.flush();
 
                 requestCount++;
             } catch (SocketTimeoutException e){ // connection 타임아웃
-                logger.debug("Socket timeout. Closing connection: {}. Handled {} requests on this connection.", e.getMessage(), requestCount);
+                logger.debug("Socket timeout : Closing connection: {}. Handled {} requests on this connection.", e.getMessage(), requestCount);
                 break;
             } catch (SocketException e){ // connection 오류
-                logger.debug("Client disconnected unexpectedly: {}. Handled {} requests on this connection.", e.getMessage(), requestCount);
+                logger.debug("Socket disconnected unexpectedly : {}. Handled {} requests on this connection.", e.getMessage(), requestCount);
+                break;
+            } catch (IllegalArgumentException e) {
+                logger.debug("Invalid argument : {}." + e.getMessage());
                 break;
             }
         }
