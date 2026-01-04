@@ -14,9 +14,10 @@ public class RegistrationHandler implements Handler{
         if(path.equals("/registration")){
             switch (method) {
                 case "GET": return StaticFileServer.serve(path + "/index.html");
+                default: return HTTPResponse.methodNotAllowed();
             }
         }
 
-        return HTTPResponse.methodNotAllowed();
+        return HTTPResponse.notFound();
     }
 }
