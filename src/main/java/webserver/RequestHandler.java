@@ -16,7 +16,7 @@ public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private static final HTTPRequestParser httpRequestParser = new HTTPRequestParser();
     private static final HTTPResponseWriter httpResponseWriter = new HTTPResponseWriter();
-    private static final int CONNECTION_TIMEOUT = 10000; // Tomcat 기본 설정 (20s)
+    private static final int CONNECTION_TIMEOUT = 20000; // Tomcat 기본 설정 (20s)
 
     private Socket connection;
 
@@ -69,8 +69,7 @@ public class RequestHandler implements Runnable {
                 HTTPResponse httpResponse = Router.route(httpRequest);
 
                 // 3. response 생성 & send
-                httpResponseWriter.addResponseHeader(dos, httpRequest.getVersion(), httpResponse);
-                httpResponseWriter.addResponseBody(dos, httpResponse.getBody());
+                httpResponseWriter.write(dos, httpRequest.getVersion(), httpResponse);
                 dos.flush();
 
                 requestCount++;
