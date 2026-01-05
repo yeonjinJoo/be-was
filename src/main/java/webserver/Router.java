@@ -10,6 +10,10 @@ public class Router {
         String path = request.getPath();
         Handler handler = HandlerMapping.getProperHandler(path);
 
-        return handler.handle(request);
+        try{
+            return handler.handle(request);
+        } catch (IllegalStateException e){
+            return HTTPResponse.conflict(e.getMessage());
+        }
     }
 }

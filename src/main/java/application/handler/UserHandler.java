@@ -4,7 +4,7 @@ import application.service.UserService;
 import webserver.http.HTTPRequest;
 import webserver.http.HTTPResponse;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class UserHandler implements Handler{
     private final UserService userService = new UserService();
@@ -17,8 +17,12 @@ public class UserHandler implements Handler{
         if(path.equals("/user/create")){
             switch (method) {
                 case "GET":
-                    if(isValidCreateParams(request.getQueryParams())) {
-                        userService.createUser();
+                    Map<String, String> queryParams = request.getQueryParams();
+                    if(isValidCreateParams(queryParams)) {
+                        userService.create(queryParams.get("userId"),
+                                queryParams.get("password"),
+                                queryParams.get("name"),
+                                queryParams.get("email"));
                         // 성공 시 redirect to main page
                         return HTTPResponse.redirect("/index.html");
                     }
@@ -32,13 +36,16 @@ public class UserHandler implements Handler{
         return HTTPResponse.notFound();
     }
 
-    private boolean isValidCreateParams(HashMap<String, String> qp) {
+    private boolean isValidCreateParams(Map<String, String> qp) {
         if (qp == null || qp.isEmpty()) return false;
 
-        return isPresent(qp, "userId") && isPresent(qp, "password") && isPresent(qp, "name");
+        return isPresent(qp, "userId")
+                && isPresent(qp, "password")
+                && isPresent(qp, "name")
+                && isPresent(qp, "email");
     }
 
-    private boolean isPresent(HashMap<String, String> qp, String key) {
+    private boolean isPresent(Map<String, String> qp, String key) {
         String v = qp.get(key);
         return v != null && !v.isBlank();
     }
