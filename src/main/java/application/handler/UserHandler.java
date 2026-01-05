@@ -20,9 +20,9 @@ public class UserHandler implements Handler{
                     Map<String, String> queryParams = request.getQueryParams();
                     if(isValidCreateParams(queryParams)) {
                         userService.create(queryParams.get("userId"),
-                                           queryParams.get("password"),
-                                           queryParams.get("name"),
-                                           queryParams.get("email"));
+                                queryParams.get("password"),
+                                queryParams.get("name"),
+                                queryParams.get("email"));
                         // 성공 시 redirect to main page
                         return HTTPResponse.redirect("/index.html");
                     }

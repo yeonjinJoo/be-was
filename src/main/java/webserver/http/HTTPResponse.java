@@ -47,6 +47,12 @@ public class HTTPResponse {
         return new HTTPResponse(httpStatus.code(), message, message.getBytes(StandardCharsets.UTF_8));
     }
 
+    public static HTTPResponse conflict(String errorMessage){
+        HTTPStatus httpStatus = HTTPStatus.CONFLICT;
+        String message = httpStatus.meesage() + "\n" + errorMessage;
+        return new HTTPResponse(httpStatus.code(), message, message.getBytes(StandardCharsets.UTF_8));
+    }
+
     public static HTTPResponse internalServerError(){
         HTTPStatus httpStatus = HTTPStatus.INTERNAL_SERVER_ERROR;
         String message = httpStatus.meesage();

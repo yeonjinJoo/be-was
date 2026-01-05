@@ -16,7 +16,7 @@ public class UserService {
     private void validDuplicateUser(String userId) {
         userDatabase.findUserById(userId)
                 .ifPresent(message -> {
-                    throw new IllegalStateException("이미 존재하는 회원입니다.");
+                    throw new IllegalStateException("이미 존재하는 아이디입니다.");
                 });
     }
 }
