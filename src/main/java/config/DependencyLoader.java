@@ -11,4 +11,3 @@ public class DependencyLoader {
         router = appConfig.router();
     }
 }
-''
