@@ -1,7 +1,7 @@
 package application.handler;
 
-import webserver.http.HTTPRequest;
-import webserver.http.HTTPResponse;
+import http.HTTPRequest;
+import http.HTTPResponse;
 
 public interface Handler {
     HTTPResponse handle(HTTPRequest request);
