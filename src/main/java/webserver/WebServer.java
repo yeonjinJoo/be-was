@@ -5,11 +5,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.*;
 
+import config.DependencyLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WebServer {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
+    private static final DependencyLoader LOADER = new DependencyLoader();
     private static final int DEFAULT_PORT = 8080;
     private static final int THREAD_POOL_SIZE = 30; // Thread 수 고정
     private static final int QUEUE_SIZE = 100; // 요청 최대 적재 수
@@ -26,7 +28,6 @@ public class WebServer {
         try (ServerSocket listenSocket = new ServerSocket(port)) {
             logger.info("Web Application Server started {} port.", port);
 
-            // 고정된 갯수의 thread 생성 - Concurrent 패키지 사용
             ExecutorService executor = new ThreadPoolExecutor(
                     THREAD_POOL_SIZE,
                     THREAD_POOL_SIZE,
@@ -42,7 +43,7 @@ public class WebServer {
                 while(true){
                     connection = listenSocket.accept();
                     try{
-                        executor.execute(new RequestHandler(connection));
+                        executor.execute(new RequestHandler(connection, LOADER.router));
                     } catch (Exception e) {
                         logger.error("Request rejected: server overloaded", e.getMessage());
                         connection.close();
