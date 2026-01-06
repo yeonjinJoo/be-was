@@ -1,42 +1,35 @@
 package webserver;
 
-import application.handler.BasicHandler;
-import application.handler.Handler;
-import application.handler.RegistrationHandler;
-import application.handler.UserHandler;
+import http.HTTPMethod;
+import webserver.handler.Handler;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HandlerMapping {
-    private static final RegistrationHandler registrationHandler = new RegistrationHandler();
-    private static final UserHandler userHandler = new UserHandler();
-    private static final BasicHandler basicHandler = new BasicHandler();
+    private final Map<HTTPMethod, List<Handler>> handlerMap = new HashMap<>();
 
-    private static final Map<String, Handler> API_HANDLERS = Map.of(
-            "/registration", registrationHandler,
-            "/user", userHandler
-    );
+    public HandlerMapping(List<Handler> handlers){
+        for(HTTPMethod httpMethod : HTTPMethod.values()){
+            List<Handler> matchedHandlers = handlers.stream()
+                    .filter(h -> h.canHandleMethod(httpMethod))
+                    .toList();
 
-    public static Handler getProperHandler(String path){
-        String topLevelPath = extractTopLevelPath(path);
-
-        Handler handler = API_HANDLERS.get(topLevelPath);
-        if (handler == null) {
-            handler = basicHandler;
+            handlerMap.put(httpMethod, new ArrayList<>(matchedHandlers));
         }
-
-        return handler;
     }
 
-    private static String extractTopLevelPath(String path) {
-        if (path == null || path.isEmpty()) return "/";
+    public Handler getProperHandler(HTTPMethod method, String path){
+        List<Handler> handlers = handlerMap.get(method);
+        for( Handler handler : handlers ){
+            if(handler.canHandle(method, path)){
+                return handler;
+            }
+        }
 
-        if (!path.startsWith("/")) path = "/" + path;
-
-        if ("/".equals(path)) return "/";
-
-        int secondSlash = path.indexOf('/', 1);
-
-        return (secondSlash == -1) ? path : path.substring(0, secondSlash);
+        // 정의되어있지 않은 요청 예외 처리 필요
+        throw new IllegalArgumentException("잘못된 요청입니다.");
     }
 }

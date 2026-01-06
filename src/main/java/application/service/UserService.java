@@ -6,10 +6,8 @@ import application.model.User;
 public class UserService {
     private final UserDatabase userDatabase = new UserDatabase();
 
-    public void create(String userId, String password, String name, String email) {
-        validDuplicateUser(userId);
-
-        User user = new User(userId, password, name, email);
+    public void create(User user) {
+        validDuplicateUser(user.getUserId());
         userDatabase.addUser(user);
     }
 

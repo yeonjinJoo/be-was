@@ -1,9 +1,8 @@
-package webserver.http;
+package http;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 
 public class HTTPRequestParser {
     public HTTPRequest parse(BufferedReader br) throws IOException {
@@ -12,7 +11,7 @@ public class HTTPRequestParser {
         if (requestLine == null) return null;
 
         String[] tokens = parseRequestLine(requestLine);
-        String method = tokens[0];
+        HTTPMethod method = HTTPMethod.valueOf(tokens[0]);
         String requestTarget = tokens[1];
         String version = tokens[2];
 

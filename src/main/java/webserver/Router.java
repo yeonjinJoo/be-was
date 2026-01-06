@@ -1,16 +1,22 @@
 package webserver;
 
-import application.handler.Handler;
-import webserver.http.HTTPRequest;
-import webserver.http.HTTPResponse;
+import http.HTTPMethod;
+import webserver.handler.Handler;
+import http.HTTPRequest;
+import http.HTTPResponse;
 
 public class Router {
+    private final HandlerMapping handlerMapping;
+    public Router(HandlerMapping handlerMapping) {
+        this.handlerMapping = handlerMapping;
+    }
 
-    public static HTTPResponse route(HTTPRequest request) {
+    public HTTPResponse route(HTTPRequest request) {
         String path = request.getPath();
-        Handler handler = HandlerMapping.getProperHandler(path);
+        HTTPMethod method = request.getMethod();
 
         try{
+            Handler handler = handlerMapping.getProperHandler(method, path);
             return handler.handle(request);
         } catch (IllegalStateException e){
             return HTTPResponse.conflict(e.getMessage());

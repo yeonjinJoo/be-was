@@ -1,16 +1,16 @@
-package webserver.http;
+package http;
 
 import java.util.HashMap;
 
 public class HTTPRequest {
-    private String method;
+    private HTTPMethod method;
     private String path;
     private HashMap<String, String> queryParams;
     private HashMap<String, String> headers;
     private String rawHeaders;
     private String version;
 
-    public HTTPRequest(String method,
+    public HTTPRequest(HTTPMethod method,
                        String path,
                        HashMap<String, String> queryParams,
                        HashMap<String, String> headers,
@@ -23,7 +23,7 @@ public class HTTPRequest {
         this.rawHeaders = rawHeaders;
         this.version = version;
     }
-    public String getMethod() {
+    public HTTPMethod getMethod() {
         return method;
     }
 

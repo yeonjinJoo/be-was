@@ -1,17 +1,33 @@
-package webserver;
+package webserver.handler;
 
-import webserver.http.HTTPResponse;
+import http.HTTPMethod;
+import http.HTTPRequest;
+import http.HTTPResponse;
 
 import java.io.*;
 
-public class StaticFileServer {
+public class StaticFileHandler implements Handler {
     private static final String baseResourcePath = "./src/main/resources/static";
 
-    public static HTTPResponse serve(String path) {
+    public boolean canHandle(HTTPMethod method, String path) {
+        if (method != HTTPMethod.GET) {
+            return false;
+        }
+        else return true;
+    }
+
+    public boolean canHandleMethod(HTTPMethod method) {
+        return method == HTTPMethod.GET;
+    }
+
+    public HTTPResponse handle(HTTPRequest request) {
         byte[] body;
-        String contentType = getContentType(path);
+        String path = request.getPath();
+
         try { // 200 - 정상 처리
-            body = readFile(path);
+            String resolvedPath = resolvePath(path);
+            body = readFile(resolvedPath);
+            String contentType = getContentType(resolvedPath);
             return HTTPResponse.ok(contentType, body);
         } catch (FileNotFoundException e) { // 404 - 파일 존재 x
             return HTTPResponse.notFound();
@@ -20,17 +36,15 @@ public class StaticFileServer {
         }
     }
 
-    private static byte[] readFile(String path) throws IOException {
-        File file = new File(baseResourcePath + path);
+    private byte[] readFile(String path) throws IOException {
+        File file = new File(path);
 
-        // 파일이 존재하지 않는 경우
+        //위의 path에 파일이 존재하지 않는 경우
         if (!file.exists() || !file.isFile()) {
-            throw new FileNotFoundException(file.getPath());
+            throw new FileNotFoundException("Resource not found: " + path);
         }
 
-        String resourcePath = baseResourcePath + path;
-
-        try (InputStream is = new FileInputStream(resourcePath)) {
+        try (InputStream is = new FileInputStream(path)) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
 
@@ -43,7 +57,17 @@ public class StaticFileServer {
         }
     }
 
-    private static String getContentType(String path) {
+    private String resolvePath(String path) {
+        String resourcePath = baseResourcePath + path;
+        File file = new File(resourcePath);
+
+        if (file.isDirectory()) {
+            resourcePath += path.endsWith("/") ? "index.html" : "/index.html";
+        }
+        return resourcePath;
+    }
+
+    private String getContentType(String path) {
         if (path.endsWith(".html") || path.endsWith("/")) return "text/html;charset=utf-8";
         if (path.endsWith(".css")) return "text/css";
         if (path.endsWith(".js")) return "application/javascript";
