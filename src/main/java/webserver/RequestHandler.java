@@ -7,10 +7,10 @@ import java.net.SocketTimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.http.HTTPRequest;
-import webserver.http.HTTPRequestParser;
-import webserver.http.HTTPResponse;
-import webserver.http.HTTPResponseWriter;
+import http.HTTPRequest;
+import http.HTTPRequestParser;
+import http.HTTPResponse;
+import http.HTTPResponseWriter;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -19,9 +19,11 @@ public class RequestHandler implements Runnable {
     private static final int CONNECTION_TIMEOUT = 20000; // Tomcat 기본 설정 (20s)
 
     private Socket connection;
+    private Router router;
 
-    public RequestHandler(Socket connectionSocket) {
+    public RequestHandler(Socket connectionSocket, Router router) {
         this.connection = connectionSocket;
+        this.router = router;
     }
 
     public void run() {
@@ -54,21 +56,15 @@ public class RequestHandler implements Runnable {
 
         while(true){
             try {
-                // 1. request 파싱
                 HTTPRequest httpRequest = httpRequestParser.parse(br);
-
                 // 클라이언트가 창 닫아서 connection 종료
                 if(httpRequest == null){
                     logger.debug("Client closed TCP connection. Handled {} requests on this connection.", requestCount);
                     break;
                 }
-                // 2. headers 출력
                 logRequestHeaders(httpRequest);
 
-                // 3. 요청 처리
-                HTTPResponse httpResponse = Router.route(httpRequest);
-
-                // 3. response 생성 & send
+                HTTPResponse httpResponse = router.route(httpRequest);
                 httpResponseWriter.write(dos, httpRequest.getVersion(), httpResponse);
                 dos.flush();
 
