@@ -5,7 +5,9 @@ import webserver.HandlerMapping;
 import webserver.Router;
 import webserver.handler.Handler;
 import webserver.handler.StaticFileHandler;
-import java.util.List;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class AppConfig {
     public Router router(){
@@ -13,15 +15,15 @@ public class AppConfig {
     }
 
     private HandlerMapping handlerMapping(){
-        return new HandlerMapping(handlersList());
+        return new HandlerMapping(handleMap());
     }
 
     // Handlers
-    private List<Handler> handlersList(){
-        return List.of(
-                userHandler(),
-                staticFileHandler()
-        );
+    private Map<String, Handler> handleMap(){
+        Map<String, Handler> map = new HashMap<>();
+        map.put("/user", userHandler());
+        map.put("/", staticFileHandler()); // fallback
+        return map;
     }
 
     private StaticFileHandler staticFileHandler(){
