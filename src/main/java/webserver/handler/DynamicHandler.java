@@ -7,5 +7,4 @@ import http.HTTPResponse;
 public abstract class DynamicHandler implements Handler{
     public abstract boolean canHandle(HTTPMethod method, String path);
     public abstract HTTPResponse handle(HTTPRequest request);
-    public abstract boolean canHandleMethod(HTTPMethod method);
 }

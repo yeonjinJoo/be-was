@@ -9,12 +9,10 @@ import webserver.handler.DynamicHandler;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class UserHandler extends DynamicHandler {
     private final UserService userService = new UserService();
     private final Map<String, HTTPMethod> canHandleList = new HashMap<String, HTTPMethod>();
-    private final Set<HTTPMethod> supportedMethods = Set.of(HTTPMethod.GET);
 
     public UserHandler() {
         canHandleList.put("/user/create", HTTPMethod.GET);
@@ -26,11 +24,6 @@ public class UserHandler extends DynamicHandler {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public boolean canHandleMethod(HTTPMethod method) {
-        return supportedMethods.contains(method);
     }
 
     @Override

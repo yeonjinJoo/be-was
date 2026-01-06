@@ -10,14 +10,10 @@ public class StaticFileHandler implements Handler {
     private static final String baseResourcePath = "./src/main/resources/static";
 
     public boolean canHandle(HTTPMethod method, String path) {
-        if (method != HTTPMethod.GET) {
-            return false;
+        if (method == HTTPMethod.GET) {
+            return true;
         }
-        else return true;
-    }
-
-    public boolean canHandleMethod(HTTPMethod method) {
-        return method == HTTPMethod.GET;
+        else return false;
     }
 
     public HTTPResponse handle(HTTPRequest request) {
