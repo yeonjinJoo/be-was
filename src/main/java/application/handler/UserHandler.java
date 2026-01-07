@@ -15,7 +15,7 @@ public class UserHandler extends DynamicHandler {
     private final Map<String, HTTPMethod> canHandleList = new HashMap<String, HTTPMethod>();
 
     public UserHandler() {
-        canHandleList.put("/user/create", HTTPMethod.GET);
+        canHandleList.put("/user/create", HTTPMethod.POST);
     }
 
     @Override
@@ -33,7 +33,7 @@ public class UserHandler extends DynamicHandler {
 
         if(path.equals("/user/create")){
             switch (method.toString()) {
-                case "GET":
+                case "POST":
                     createUser(request);
                     return HTTPResponse.redirect("/index.html");
                 default:
@@ -46,14 +46,14 @@ public class UserHandler extends DynamicHandler {
     }
 
     private void createUser(HTTPRequest request) {
-        Map<String, String> queryParams = request.getQueryParams();
-        if(!isValidCreateParams(queryParams)) {
+        Map<String, String> bodyParams = request.getBodyParams();
+        if(!isValidCreateParams(bodyParams)) {
             // illegal error 던지기. bad Request
         }
-        User user = new User(queryParams.get("userId"),
-                queryParams.get("password"),
-                queryParams.get("name"),
-                queryParams.get("email"));
+        User user = new User(bodyParams.get("userId"),
+                bodyParams.get("password"),
+                bodyParams.get("name"),
+                bodyParams.get("email"));
         userService.create(user);
     }
 
