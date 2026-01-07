@@ -7,6 +7,7 @@ public class HTTPRequest {
     private String path;
     private HashMap<String, String> queryParams;
     private HashMap<String, String> headers;
+    private HashMap<String, String> bodyParams;
     private String rawHeaders;
     private String version;
 
@@ -14,12 +15,14 @@ public class HTTPRequest {
                        String path,
                        HashMap<String, String> queryParams,
                        HashMap<String, String> headers,
+                       HashMap<String, String> bodyParams,
                        String rawHeaders,
                        String version) {
         this.method = method;
         this.path = path;
         this.queryParams = queryParams;
         this.headers = headers;
+        this.bodyParams = bodyParams;
         this.rawHeaders = rawHeaders;
         this.version = version;
     }
@@ -40,6 +43,8 @@ public class HTTPRequest {
     public String getRawHeaders() {
         return rawHeaders;
     }
+
+    public HashMap<String, String> getBodyParams() { return bodyParams; }
 
     public String getVersion() {
         return version;

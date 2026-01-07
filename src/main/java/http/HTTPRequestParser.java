@@ -23,7 +23,10 @@ public class HTTPRequestParser {
         StringBuilder rawHeaders = new StringBuilder().append(requestLine).append("\r\n");
         HashMap<String, String> headers = parseHeaders(br, rawHeaders);
 
-        return new HTTPRequest(method, path, queryParams, headers, rawHeaders.toString(), version);
+        // 4. 바디 파싱
+        HashMap<String, String> bodyParams = parseBody(br, headers);
+
+        return new HTTPRequest(method, path, queryParams, headers, bodyParams, rawHeaders.toString(), version);
     }
 
     private String[] parseRequestLine(String requestLine) {
@@ -57,12 +60,39 @@ public class HTTPRequestParser {
             rawHeaders.append(line).append("\r\n");
             int colonIndex = line.indexOf(":");
             if (colonIndex > 0) {
-                String key = line.substring(0, colonIndex).trim();
+                String key = line.substring(0, colonIndex).trim().toLowerCase();
                 String value = line.substring(colonIndex + 1).trim();
                 headers.put(key, value);
             }
         }
         return headers;
+    }
+
+    private HashMap<String, String> parseBody(BufferedReader br, HashMap<String, String> headers) throws IOException {
+        HashMap<String, String> bodyParams = new HashMap<>();
+        if(!headers.containsKey("content-length") || !headers.containsKey("content-type")) {
+            return bodyParams;
+        }
+
+        // 현재 application/x-www-form-urlencoded 타입만 지원
+        String contentType = headers.get("content-type");
+        if(!contentType.equals("application/x-www-form-urlencoded")) {
+            // throw 에러
+            throw new IllegalArgumentException("처리할 수 없는 body입니다.");
+        }
+
+
+        int contentLength = Integer.parseInt(headers.get("content-length"));
+        char[] buffer = new char[contentLength];
+        int bytesRead = 0;
+        while (bytesRead < contentLength) {
+            int read = br.read(buffer, bytesRead, contentLength - bytesRead);
+            if (read == -1) break; // 스트림 끝 도달
+            bytesRead += read;
+        }
+
+        String bodyData = new String(buffer);
+        return parseQueryString(bodyData);
     }
 
     private HashMap<String, String> parseQueryString(String queryString) {
