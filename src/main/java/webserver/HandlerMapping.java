@@ -1,6 +1,6 @@
 package webserver;
 
-import http.HTTPMethod;
+import webserver.http.HTTPMethod;
 import webserver.handler.Handler;
 import java.util.Map;
 

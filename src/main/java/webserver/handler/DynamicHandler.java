@@ -1,8 +1,8 @@
 package webserver.handler;
 
-import http.HTTPMethod;
-import http.HTTPRequest;
-import http.HTTPResponse;
+import webserver.http.HTTPMethod;
+import webserver.http.HTTPRequest;
+import webserver.http.HTTPResponse;
 
 public abstract class DynamicHandler implements Handler{
     public abstract boolean canHandle(HTTPMethod method, String path);

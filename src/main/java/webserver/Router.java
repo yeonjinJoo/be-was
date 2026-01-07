@@ -1,9 +1,9 @@
 package webserver;
 
-import http.HTTPMethod;
+import webserver.http.HTTPMethod;
 import webserver.handler.Handler;
-import http.HTTPRequest;
-import http.HTTPResponse;
+import webserver.http.HTTPRequest;
+import webserver.http.HTTPResponse;
 
 public class Router {
     private final HandlerMapping handlerMapping;

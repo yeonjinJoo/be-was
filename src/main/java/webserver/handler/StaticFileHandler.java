@@ -1,9 +1,9 @@
 package webserver.handler;
 
-import http.ContentType;
-import http.HTTPMethod;
-import http.HTTPRequest;
-import http.HTTPResponse;
+import webserver.http.ContentType;
+import webserver.http.HTTPMethod;
+import webserver.http.HTTPRequest;
+import webserver.http.HTTPResponse;
 
 import java.io.*;
 

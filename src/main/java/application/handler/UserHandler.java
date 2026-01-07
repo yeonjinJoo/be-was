@@ -2,9 +2,9 @@ package application.handler;
 
 import application.model.User;
 import application.service.UserService;
-import http.HTTPMethod;
-import http.HTTPRequest;
-import http.HTTPResponse;
+import webserver.http.HTTPMethod;
+import webserver.http.HTTPRequest;
+import webserver.http.HTTPResponse;
 import webserver.handler.DynamicHandler;
 
 import java.util.HashMap;
