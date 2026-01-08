@@ -2,6 +2,9 @@ package application.service;
 
 import application.db.UserDatabase;
 import application.model.User;
+import webserver.exception.AuthenticationException;
+
+import java.util.Optional;
 
 public class UserService {
     private final UserDatabase userDatabase;
@@ -23,12 +26,11 @@ public class UserService {
     }
 
     public User login(String userId, String password) {
-
         User user = userDatabase.findUserById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new AuthenticationException("아이디 또는 비밀번호가 일치하지 않습니다."));
 
         if(!user.getPassword().equals(password)) {
-            throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
+            throw new AuthenticationException("아이디 또는 비밀번호가 일치하지 않습니다.");
         }
 
         return user;
