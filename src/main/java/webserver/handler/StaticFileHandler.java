@@ -1,7 +1,6 @@
 package webserver.handler;
 
 import webserver.http.ContentType;
-import webserver.http.HTTPMethod;
 import webserver.http.HTTPRequest;
 import webserver.http.HTTPResponse;
 
@@ -9,10 +8,6 @@ import java.io.*;
 
 public class StaticFileHandler implements Handler {
     private static final String baseResourcePath = "./src/main/resources/static";
-
-    public boolean canHandle(HTTPMethod method, String path) {
-        return method == HTTPMethod.GET;
-    }
 
     public HTTPResponse handle(HTTPRequest request) {
         byte[] body;

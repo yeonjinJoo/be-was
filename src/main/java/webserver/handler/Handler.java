@@ -6,5 +6,4 @@ import webserver.http.HTTPResponse;
 
 public interface Handler {
     HTTPResponse handle(HTTPRequest request);
-    boolean canHandle(HTTPMethod method, String path);
 }
