@@ -1,0 +1,47 @@
+package application.handler;
+
+import application.model.User;
+import application.service.UserService;
+import webserver.handler.DynamicHandler;
+import webserver.http.HTTPRequest;
+import webserver.http.HTTPResponse;
+import webserver.session.CookieUtils;
+import webserver.session.SessionManager;
+
+import java.util.Map;
+
+public class UserLoginController extends DynamicHandler {
+
+    private final UserService userService;
+    private final SessionManager sessionManager;
+
+    public UserLoginController(UserService userService, SessionManager sessionManager){
+        this.userService = userService;
+        this.sessionManager = sessionManager;
+    }
+
+    @Override
+    public HTTPResponse handle(HTTPRequest request) {
+        Map<String, String> bodyParams = request.getBodyParams();
+        if(!isValidLogin(bodyParams)) {
+            throw new IllegalStateException("Parameter가 잘못되었습니다.");
+        }
+
+        User user = userService.login(bodyParams.get("userId"), bodyParams.get("password"));
+        String sid = sessionManager.createSession(user);
+        HTTPResponse response = HTTPResponse.redirect("/index.html");
+        response.addHeader("Set-Cookie", CookieUtils.buildSetCookieSid(sid));
+        return response;
+    }
+
+    private boolean isValidLogin(Map<String, String> qp) {
+        if (qp == null || qp.isEmpty()) return false;
+        return isPresent(qp, "userId")
+                && isPresent(qp, "password");
+    }
+
+    private boolean isPresent(Map<String, String> qp, String key) {
+        String v = qp.get(key);
+        return v != null && !v.isBlank();
+    }
+}

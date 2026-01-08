@@ -1,24 +1,13 @@
 package webserver.handler;
 
-import http.HTTPMethod;
-import http.HTTPRequest;
-import http.HTTPResponse;
+import webserver.http.ContentType;
+import webserver.http.HTTPRequest;
+import webserver.http.HTTPResponse;
 
 import java.io.*;
 
 public class StaticFileHandler implements Handler {
     private static final String baseResourcePath = "./src/main/resources/static";
-
-    public boolean canHandle(HTTPMethod method, String path) {
-        if (method != HTTPMethod.GET) {
-            return false;
-        }
-        else return true;
-    }
-
-    public boolean canHandleMethod(HTTPMethod method) {
-        return method == HTTPMethod.GET;
-    }
 
     public HTTPResponse handle(HTTPRequest request) {
         byte[] body;
@@ -27,7 +16,7 @@ public class StaticFileHandler implements Handler {
         try { // 200 - 정상 처리
             String resolvedPath = resolvePath(path);
             body = readFile(resolvedPath);
-            String contentType = getContentType(resolvedPath);
+            String contentType = ContentType.fromPath(resolvedPath).getContentType();
             return HTTPResponse.ok(contentType, body);
         } catch (FileNotFoundException e) { // 404 - 파일 존재 x
             return HTTPResponse.notFound();
@@ -65,16 +54,5 @@ public class StaticFileHandler implements Handler {
             resourcePath += path.endsWith("/") ? "index.html" : "/index.html";
         }
         return resourcePath;
-    }
-
-    private String getContentType(String path) {
-        if (path.endsWith(".html") || path.endsWith("/")) return "text/html;charset=utf-8";
-        if (path.endsWith(".css")) return "text/css";
-        if (path.endsWith(".js")) return "application/javascript";
-        if (path.endsWith(".ico")) return "image/x-icon";
-        if (path.endsWith(".svg")) return "image/svg+xml";
-        if (path.endsWith(".png")) return "image/png";
-        if (path.endsWith(".jpg") || path.endsWith(".jpeg")) return "image/jpeg";
-        return "application/octet-stream"; // 알 수 없는 확장자로, 다운로드 처리
     }
 }

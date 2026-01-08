@@ -1,34 +1,46 @@
 package config;
 
-import application.handler.UserHandler;
+import application.db.UserDatabase;
+import application.handler.UserCreateHandler;
+import application.handler.UserLoginController;
+import application.service.UserService;
 import webserver.HandlerMapping;
+import webserver.RouteKey;
 import webserver.Router;
 import webserver.handler.Handler;
 import webserver.handler.StaticFileHandler;
-import java.util.List;
+import webserver.http.HTTPMethod;
+import webserver.session.SessionManager;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class AppConfig {
-    public Router router(){
-        return new Router(handlerMapping());
+
+    private final UserDatabase userDatabase = new UserDatabase();
+    private final UserService userService = new UserService(userDatabase);
+
+    private final SessionManager sessionManager = new SessionManager();
+
+    private final StaticFileHandler staticFileHandler = new StaticFileHandler();
+    private final UserCreateHandler userCreateHandler = new UserCreateHandler(userService);
+    private final UserLoginController userLoginController = new UserLoginController(userService, sessionManager);
+
+    private final HandlerMapping handlerMapping = new HandlerMapping(handleMap(), staticFileHandler);
+
+    public AppConfig(){
+        router();
     }
 
-    private HandlerMapping handlerMapping(){
-        return new HandlerMapping(handlersList());
+    public Router router(){
+        return new Router(handlerMapping, sessionManager);
     }
 
     // Handlers
-    private List<Handler> handlersList(){
-        return List.of(
-                userHandler(),
-                staticFileHandler()
-        );
-    }
-
-    private StaticFileHandler staticFileHandler(){
-        return new StaticFileHandler();
-    }
-
-    private UserHandler userHandler(){
-        return new UserHandler();
+    private Map<RouteKey, Handler> handleMap(){
+        Map<RouteKey, Handler> map = new HashMap<>();
+        map.put(new RouteKey(HTTPMethod.POST, "/user/create"), userCreateHandler);
+        map.put(new RouteKey(HTTPMethod.POST, "/user/login"), userLoginController);
+        return map;
     }
 }

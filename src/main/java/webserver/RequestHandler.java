@@ -7,10 +7,10 @@ import java.net.SocketTimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import http.HTTPRequest;
-import http.HTTPRequestParser;
-import http.HTTPResponse;
-import http.HTTPResponseWriter;
+import webserver.http.HTTPRequest;
+import webserver.http.HTTPRequestParser;
+import webserver.http.HTTPResponse;
+import webserver.http.HTTPResponseWriter;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);

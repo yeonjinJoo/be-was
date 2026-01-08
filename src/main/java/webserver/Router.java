@@ -1,14 +1,18 @@
 package webserver;
 
-import http.HTTPMethod;
+import webserver.http.HTTPMethod;
 import webserver.handler.Handler;
-import http.HTTPRequest;
-import http.HTTPResponse;
+import webserver.http.HTTPRequest;
+import webserver.http.HTTPResponse;
+import webserver.session.SessionManager;
 
 public class Router {
     private final HandlerMapping handlerMapping;
-    public Router(HandlerMapping handlerMapping) {
+    private final SessionManager sessionManager;
+
+    public Router(HandlerMapping handlerMapping, SessionManager sessionManager) {
         this.handlerMapping = handlerMapping;
+        this.sessionManager = sessionManager;
     }
 
     public HTTPResponse route(HTTPRequest request) {
