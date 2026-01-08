@@ -1,9 +1,11 @@
 package config;
 
 import application.db.UserDatabase;
-import application.handler.UserHandler;
+import application.handler.UserCreateHandler;
+import application.handler.UserLoginController;
 import application.service.UserService;
 import webserver.HandlerMapping;
+import webserver.RouteKey;
 import webserver.Router;
 import webserver.handler.Handler;
 import webserver.handler.StaticFileHandler;
@@ -21,9 +23,10 @@ public class AppConfig {
     private final SessionManager sessionManager = new SessionManager();
 
     private final StaticFileHandler staticFileHandler = new StaticFileHandler();
-    private final UserHandler userHandler = new UserHandler(userService, userHandlerHandleList(), sessionManager);
+    private final UserCreateHandler userCreateHandler = new UserCreateHandler(userService);
+    private final UserLoginController userLoginController = new UserLoginController(userService, sessionManager);
 
-    private final HandlerMapping handlerMapping = new HandlerMapping(handleMap());
+    private final HandlerMapping handlerMapping = new HandlerMapping(handleMap(), staticFileHandler);
 
     public AppConfig(){
         router();
@@ -34,17 +37,10 @@ public class AppConfig {
     }
 
     // Handlers
-    private Map<String, Handler> handleMap(){
-        Map<String, Handler> map = new HashMap<>();
-        map.put("/user", userHandler);
-        map.put("/", staticFileHandler); // fallback
-        return map;
-    }
-
-    private Map<String, HTTPMethod> userHandlerHandleList(){
-        Map<String, HTTPMethod> map = new HashMap<>();
-        map.put("/user/create", HTTPMethod.POST);
-        map.put("/user/login", HTTPMethod.POST);
+    private Map<RouteKey, Handler> handleMap(){
+        Map<RouteKey, Handler> map = new HashMap<>();
+        map.put(new RouteKey(HTTPMethod.POST, "/user/create"), userCreateHandler);
+        map.put(new RouteKey(HTTPMethod.POST, "/user/login"), userLoginController);
         return map;
     }
 }

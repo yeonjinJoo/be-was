@@ -1,36 +1,26 @@
 package webserver;
 
+import webserver.handler.StaticFileHandler;
 import webserver.http.HTTPMethod;
 import webserver.handler.Handler;
 import java.util.Map;
 
 public class HandlerMapping {
-    private final Map<String, Handler> handlerMap;
+    private final Map<RouteKey, Handler> handlerMap;
+    private final StaticFileHandler staticFileHandler;
 
-    public HandlerMapping(Map<String, Handler> handlerMap){
+    public HandlerMapping(Map<RouteKey, Handler> handlerMap, StaticFileHandler staticFileHandler){
         this.handlerMap = handlerMap;
+        this.staticFileHandler = staticFileHandler;
     }
 
     public Handler getProperHandler(HTTPMethod method, String path){
-        String key = topLevelPath(path);
+        Handler h = handlerMap.get(new RouteKey(method, path));
+        if(h != null) {return h;}
 
-        Handler h = handlerMap.get(key);
-        if(h != null && h.canHandle(method, path)) {return h;}
-
-        Handler fallback = handlerMap.get("/");
-        if(fallback != null && fallback.canHandle(method, path)) {return fallback;}
+        if(method == HTTPMethod.GET) {return staticFileHandler;}
 
         // 정의되어있지 않은 요청 예외 처리 필요
         throw new IllegalArgumentException("잘못된 요청입니다.");
-    }
-
-    private static String topLevelPath(String path) {
-        if (path == null || path.isBlank()) return "/";
-
-        if (!path.startsWith("/")) path = "/" + path;
-        if (path.equals("/")) return "/";
-
-        int secondSlash = path.indexOf('/', 1);
-        return (secondSlash == -1) ? path : path.substring(0, secondSlash);
     }
 }
