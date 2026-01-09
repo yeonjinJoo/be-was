@@ -43,7 +43,7 @@ public class WebServer {
                 while(true){
                     connection = listenSocket.accept();
                     try{
-                        executor.execute(new RequestHandler(connection, LOADER.router));
+                        executor.execute(new RequestHandler(connection, LOADER.dispatcher));
                     } catch (Exception e) {
                         logger.error("Request rejected: server overloaded", e.getMessage());
                         connection.close();
