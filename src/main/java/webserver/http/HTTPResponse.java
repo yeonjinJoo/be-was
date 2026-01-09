@@ -2,15 +2,17 @@ package webserver.http;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Map;
 
 public class HTTPResponse {
 
-    private int statusCode;
-    private String statusMessage;
-    private byte[] body;
-    private String contentType;
+    private int statusCode = 200; // 기본값 OK
+    private String statusMessage = "OK";
+    private byte[] body = new byte[0];
+    private String contentType = "text/html;charset=utf-8";
+    private final Map<String, String> headers = new HashMap<>();
 
-    private HashMap<String, String> headers = new HashMap<>();
+    public HTTPResponse() {}
 
     public HTTPResponse(int statusCode, String statusMessage, byte[] body){
         this(statusCode, statusMessage, body, "text/html;charset=utf-8");
@@ -65,6 +67,17 @@ public class HTTPResponse {
         return new HTTPResponse(httpStatus.code(), message, message.getBytes(StandardCharsets.UTF_8));
     }
 
+    public void setStatus(HTTPStatus status) {
+        this.statusCode = status.code();
+        this.statusMessage = status.meesage(); // 오타(meesage)는 기존 코드 유지함
+    }
+
+    public void setRedirect(String location) {
+        setStatus(HTTPStatus.REDIRECT);
+        addHeader("Location", location);
+        this.body = new byte[0];
+    }
+
     public int getStatusCode() {
         return statusCode;
     }
@@ -78,7 +91,9 @@ public class HTTPResponse {
     public void addHeader(String key, String value){
         headers.put(key, value);
     }
-    public HashMap<String, String> getHeaders() {
+    public Map<String, String> getHeaders() {
         return headers;
     }
+
+
 }

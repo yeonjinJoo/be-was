@@ -11,6 +11,7 @@ public class HTTPResponseWriter {
                       HTTPResponse response) throws IOException {
         writeHeaders(dos, version, response);
         writeBody(dos, response.getBody());
+        dos.flush();
     }
 
     private void writeHeaders(DataOutputStream dos,
