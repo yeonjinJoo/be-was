@@ -2,7 +2,6 @@ package application.service;
 
 import application.db.UserDatabase;
 import application.model.User;
-import webserver.exception.AuthenticationException;
 
 import java.util.Optional;
 
@@ -26,13 +25,12 @@ public class UserService {
     }
 
     public User login(String userId, String password) {
-        User user = userDatabase.findUserById(userId)
-                .orElseThrow(() -> new AuthenticationException("아이디 또는 비밀번호가 일치하지 않습니다."));
+        Optional<User> user = userDatabase.findUserById(userId);
 
-        if(!user.getPassword().equals(password)) {
-            throw new AuthenticationException("아이디 또는 비밀번호가 일치하지 않습니다.");
+        if(user.isEmpty() || !user.get().getPassword().equals(password)) {
+            return null;
         }
 
-        return user;
+        return user.get();
     }
 }
