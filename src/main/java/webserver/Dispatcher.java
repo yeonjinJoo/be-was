@@ -4,7 +4,7 @@ import webserver.http.HTTPMethod;
 import webserver.handler.Handler;
 import webserver.http.HTTPRequest;
 import webserver.http.HTTPResponse;
-import webserver.session.SessionManager;
+import session.SessionManager;
 
 public class Router {
     private final HandlerMapping handlerMapping;
