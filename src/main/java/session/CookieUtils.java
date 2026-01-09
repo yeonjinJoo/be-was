@@ -1,4 +1,4 @@
-package webserver.session;
+package session;
 
 public class CookieUtils {
     public static String getCookieValue(String cookieHeader, String key) {
@@ -20,10 +20,10 @@ public class CookieUtils {
     }
 
     public static String buildSetCookieSid(String sid) {
-        return "sid=" + sid + "; Path=/";
+        return "sid=" + sid + "; Path=/; HttpOnly";
     }
 
     public static String buildExpireSidCookie() {
-        return "sid=; Max-Age=0; Path=/";
+        return "sid=; Max-Age=0; Path=/; HttpOnly";
     }
 }
