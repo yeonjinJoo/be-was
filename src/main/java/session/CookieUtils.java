@@ -23,7 +23,7 @@ public class CookieUtils {
         return "sid=" + sid + "; Path=/; HttpOnly";
     }
 
-    public static String buildExpireSidCookie() {
-        return "sid=; Max-Age=0; Path=/; HttpOnly";
+    public static String buildExpireSidCookie(String sid) {
+        return "sid=" + sid + "; Max-Age=0; Path=/; HttpOnly";
     }
 }
