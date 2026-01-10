@@ -8,6 +8,6 @@ public class DependencyLoader {
 
     public DependencyLoader(){
         this.appConfig = new AppConfig();
-        dispatcher = appConfig.router();
+        dispatcher = appConfig.dispatcher();
     }
 }

@@ -1,6 +1,6 @@
 package config;
 
-import application.db.UserDatabase;
+import db.UserDatabase;
 import application.handler.UserCreateHandler;
 import application.handler.UserLoginHandler;
 import application.handler.UserLogoutHandler;
@@ -11,7 +11,7 @@ import webserver.Dispatcher;
 import webserver.handler.Handler;
 import webserver.handler.StaticFileHandler;
 import webserver.http.HTTPMethod;
-import session.SessionManager;
+import webserver.session.SessionManager;
 import webserver.interceptor.InterceptorRegistry;
 import webserver.interceptor.LoginCheckInterceptor;
 
@@ -37,10 +37,10 @@ public class AppConfig {
     private final InterceptorRegistry interceptorRegistry = configureInterceptors();
 
     public AppConfig() {
-        router();
+        dispatcher();
     }
 
-    public Dispatcher router() {
+    public Dispatcher dispatcher() {
         return new Dispatcher(handlerMapping, interceptorRegistry);
     }
 
