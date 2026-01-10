@@ -51,8 +51,7 @@ public class HTTPResponse {
 
     public static HTTPResponse conflict(String errorMessage){
         HTTPStatus httpStatus = HTTPStatus.CONFLICT;
-        String message = httpStatus.meesage() + "\n" + errorMessage;
-        return new HTTPResponse(httpStatus.code(), message, message.getBytes(StandardCharsets.UTF_8));
+        return new HTTPResponse(httpStatus.code(), httpStatus.meesage(), errorMessage.getBytes(StandardCharsets.UTF_8));
     }
 
     public static HTTPResponse internalServerError(){
