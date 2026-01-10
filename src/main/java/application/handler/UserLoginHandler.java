@@ -5,17 +5,17 @@ import application.service.UserService;
 import webserver.handler.DynamicHandler;
 import webserver.http.HTTPRequest;
 import webserver.http.HTTPResponse;
-import webserver.session.CookieUtils;
-import webserver.session.SessionManager;
+import session.CookieUtils;
+import session.SessionManager;
 
 import java.util.Map;
 
-public class UserLoginController extends DynamicHandler {
+public class UserLoginHandler extends DynamicHandler {
 
     private final UserService userService;
     private final SessionManager sessionManager;
 
-    public UserLoginController(UserService userService, SessionManager sessionManager){
+    public UserLoginHandler(UserService userService, SessionManager sessionManager){
         this.userService = userService;
         this.sessionManager = sessionManager;
     }
@@ -29,7 +29,7 @@ public class UserLoginController extends DynamicHandler {
 
         User user = userService.login(bodyParams.get("userId"), bodyParams.get("password"));
         String sid = sessionManager.createSession(user);
-        HTTPResponse response = HTTPResponse.redirect("/index.html");
+        HTTPResponse response = HTTPResponse.redirect("/main");
         response.addHeader("Set-Cookie", CookieUtils.buildSetCookieSid(sid));
         return response;
     }

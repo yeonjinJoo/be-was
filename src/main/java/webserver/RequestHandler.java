@@ -19,27 +19,26 @@ public class RequestHandler implements Runnable {
     private static final int CONNECTION_TIMEOUT = 20000; // Tomcat 기본 설정 (20s)
 
     private Socket connection;
-    private Router router;
+    private Dispatcher dispatcher;
 
-    public RequestHandler(Socket connectionSocket, Router router) {
+    public RequestHandler(Socket connectionSocket, Dispatcher dispatcher) {
         this.connection = connectionSocket;
-        this.router = router;
+        this.dispatcher = dispatcher;
     }
 
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
-        // TCP connection timeout 시간 설정
         configureTimeout();
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // 요청 처리
             handleConnection(in, out);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
+    // TCP connection timeout 시간 설정
     private void configureTimeout(){
         try{
             connection.setSoTimeout(CONNECTION_TIMEOUT);
@@ -57,16 +56,14 @@ public class RequestHandler implements Runnable {
         while(true){
             try {
                 HTTPRequest httpRequest = httpRequestParser.parse(br);
-                // 클라이언트가 창 닫아서 connection 종료
                 if(httpRequest == null){
                     logger.debug("Client closed TCP connection. Handled {} requests on this connection.", requestCount);
                     break;
                 }
-                logRequestHeaders(httpRequest);
 
-                HTTPResponse httpResponse = router.route(httpRequest);
+                logRequestHeaders(httpRequest);
+                HTTPResponse httpResponse = dispatcher.dispatch(httpRequest);
                 httpResponseWriter.write(dos, httpRequest.getVersion(), httpResponse);
-                dos.flush();
 
                 requestCount++;
             } catch (SocketTimeoutException e){ // connection 타임아웃

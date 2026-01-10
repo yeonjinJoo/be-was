@@ -1,10 +1,16 @@
 package webserver.http;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import session.CookieUtils;
+import webserver.WebServer;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
 
 public class HTTPRequestParser {
+    private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
     public HTTPRequest parse(BufferedReader br) throws IOException {
         // 1. requestLine 읽기
         String requestLine = br.readLine();
@@ -23,10 +29,14 @@ public class HTTPRequestParser {
         StringBuilder rawHeaders = new StringBuilder().append(requestLine).append("\r\n");
         HashMap<String, String> headers = parseHeaders(br, rawHeaders);
 
-        // 4. 바디 파싱
+        // 4. sid 파싱
+        String cookieValue = headers.get("cookie");
+        String sid = cookieValue == null ? null : CookieUtils.getCookieValue(cookieValue, "sid");
+
+        // 5. 바디 파싱
         HashMap<String, String> bodyParams = parseBody(br, headers);
 
-        return new HTTPRequest(method, path, queryParams, headers, bodyParams, rawHeaders.toString(), version);
+        return new HTTPRequest(method, path, queryParams, headers, bodyParams, rawHeaders.toString(), version, sid);
     }
 
     private String[] parseRequestLine(String requestLine) {

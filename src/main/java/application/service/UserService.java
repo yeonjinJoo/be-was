@@ -3,6 +3,8 @@ package application.service;
 import application.db.UserDatabase;
 import application.model.User;
 
+import java.util.Optional;
+
 public class UserService {
     private final UserDatabase userDatabase;
 
@@ -23,14 +25,12 @@ public class UserService {
     }
 
     public User login(String userId, String password) {
+        Optional<User> user = userDatabase.findUserById(userId);
 
-        User user = userDatabase.findUserById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
-        if(!user.getPassword().equals(password)) {
-            throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
+        if(user.isEmpty() || !user.get().getPassword().equals(password)) {
+            return null;
         }
 
-        return user;
+        return user.get();
     }
 }

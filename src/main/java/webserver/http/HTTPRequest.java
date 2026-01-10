@@ -10,6 +10,7 @@ public class HTTPRequest {
     private HashMap<String, String> bodyParams;
     private String rawHeaders;
     private String version;
+    private String sid;
 
     public HTTPRequest(HTTPMethod method,
                        String path,
@@ -17,7 +18,8 @@ public class HTTPRequest {
                        HashMap<String, String> headers,
                        HashMap<String, String> bodyParams,
                        String rawHeaders,
-                       String version) {
+                       String version,
+                       String sid) {
         this.method = method;
         this.path = path;
         this.queryParams = queryParams;
@@ -25,6 +27,7 @@ public class HTTPRequest {
         this.bodyParams = bodyParams;
         this.rawHeaders = rawHeaders;
         this.version = version;
+        this.sid = sid;
     }
     public HTTPMethod getMethod() {
         return method;
@@ -49,4 +52,6 @@ public class HTTPRequest {
     public String getVersion() {
         return version;
     }
+
+    public String getSid() { return sid; }
 }

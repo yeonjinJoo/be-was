@@ -1,13 +1,13 @@
 package config;
 
-import webserver.Router;
+import webserver.Dispatcher;
 
 public class DependencyLoader {
     private final AppConfig appConfig;
-    public final Router router;
+    public final Dispatcher dispatcher;
 
     public DependencyLoader(){
         this.appConfig = new AppConfig();
-        router = appConfig.router();
+        dispatcher = appConfig.router();
     }
 }
