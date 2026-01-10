@@ -1,7 +1,7 @@
 package webserver.interceptor;
 
 import application.model.User;
-import session.SessionManager;
+import webserver.session.SessionManager;
 import webserver.http.HTTPRequest;
 import webserver.http.HTTPResponse;
 

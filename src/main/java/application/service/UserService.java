@@ -1,6 +1,6 @@
 package application.service;
 
-import application.db.UserDatabase;
+import db.UserDatabase;
 import application.model.User;
 
 import java.util.Optional;

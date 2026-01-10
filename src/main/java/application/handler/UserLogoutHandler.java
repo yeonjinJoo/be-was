@@ -1,7 +1,7 @@
 package application.handler;
 
-import session.CookieUtils;
-import session.SessionManager;
+import webserver.session.CookieUtils;
+import webserver.session.SessionManager;
 import webserver.handler.DynamicHandler;
 import webserver.http.HTTPRequest;
 import webserver.http.HTTPResponse;

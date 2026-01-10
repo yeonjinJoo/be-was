@@ -2,7 +2,7 @@ package webserver.http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import session.CookieUtils;
+import webserver.session.CookieUtils;
 import webserver.WebServer;
 
 import java.io.BufferedReader;

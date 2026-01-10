@@ -5,8 +5,8 @@ import application.service.UserService;
 import webserver.handler.DynamicHandler;
 import webserver.http.HTTPRequest;
 import webserver.http.HTTPResponse;
-import session.CookieUtils;
-import session.SessionManager;
+import webserver.session.CookieUtils;
+import webserver.session.SessionManager;
 
 import java.util.Map;
 
