@@ -8,6 +8,6 @@ public class NotFoundException extends WebException {
     }
 
     public static NotFoundException pageNotFound(String path){
-        return new NotFoundException("존재하지 않는 경로입니다: " + path);
+        return new NotFoundException("요청하신 경로를 처리할 수 없거나 존재하지 않습니다: " + path);
     }
 }
