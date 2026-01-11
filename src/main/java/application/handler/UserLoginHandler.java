@@ -2,6 +2,7 @@ package application.handler;
 
 import application.model.User;
 import application.service.UserService;
+import webserver.exception.BadRequestException;
 import webserver.handler.DynamicHandler;
 import webserver.http.HTTPRequest;
 import webserver.http.HTTPResponse;
@@ -24,7 +25,7 @@ public class UserLoginHandler extends DynamicHandler {
     public HTTPResponse handle(HTTPRequest request) {
         Map<String, String> bodyParams = request.getBodyParams();
         if(!isValidLogin(bodyParams)) {
-            throw new IllegalStateException("Parameter가 잘못되었습니다.");
+            throw BadRequestException.missingParameters();
         }
 
         User user = userService.login(bodyParams.get("userId"), bodyParams.get("password"));

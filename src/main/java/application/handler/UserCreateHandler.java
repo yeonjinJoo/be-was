@@ -2,11 +2,10 @@ package application.handler;
 
 import application.model.User;
 import application.service.UserService;
+import webserver.exception.BadRequestException;
 import webserver.handler.DynamicHandler;
 import webserver.http.HTTPRequest;
 import webserver.http.HTTPResponse;
-
-import java.security.InvalidParameterException;
 import java.util.Map;
 
 public class UserCreateHandler extends DynamicHandler {
@@ -26,9 +25,9 @@ public class UserCreateHandler extends DynamicHandler {
     private User createUser(HTTPRequest request) {
         Map<String, String> bodyParams = request.getBodyParams();
         if(!isValidCreateParams(bodyParams)) {
-            // illegal error 던지기. bad Request
-            throw new InvalidParameterException("Invalid request parameters");
+            throw BadRequestException.missingParameters();
         }
+
         User user = new User(bodyParams.get("userId"),
                 bodyParams.get("password"),
                 bodyParams.get("name"),
