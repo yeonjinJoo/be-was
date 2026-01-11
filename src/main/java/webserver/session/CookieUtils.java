@@ -1,4 +1,4 @@
-package session;
+package webserver.session;
 
 public class CookieUtils {
     public static String getCookieValue(String cookieHeader, String key) {

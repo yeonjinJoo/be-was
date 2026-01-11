@@ -1,4 +1,4 @@
-package application.db;
+package db;
 
 import application.model.User;
 

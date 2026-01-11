@@ -1,7 +1,9 @@
 package application.service;
 
-import application.db.UserDatabase;
+import db.UserDatabase;
 import application.model.User;
+import webserver.exception.BadRequestException;
+import webserver.exception.ConflictException;
 
 import java.util.Optional;
 
@@ -19,18 +21,19 @@ public class UserService {
 
     private void validDuplicateUser(String userId) {
         userDatabase.findUserById(userId)
-                .ifPresent(message -> {
-                    throw new IllegalStateException("이미 존재하는 아이디입니다.");
+                .ifPresent(user -> {
+                    throw ConflictException.dupliacteUserId();
                 });
     }
 
     public User login(String userId, String password) {
-        Optional<User> user = userDatabase.findUserById(userId);
+        User user = userDatabase.findUserById(userId)
+                .orElseThrow(() -> BadRequestException.invalidLogin());
 
-        if(user.isEmpty() || !user.get().getPassword().equals(password)) {
-            return null;
+        if(!user.getPassword().equals(password)){
+            throw BadRequestException.invalidLogin();
         }
 
-        return user.get();
+        return user;
     }
 }

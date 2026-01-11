@@ -12,8 +12,6 @@ public class HTTPResponse {
     private String contentType = "text/html;charset=utf-8";
     private final Map<String, String> headers = new HashMap<>();
 
-    public HTTPResponse() {}
-
     public HTTPResponse(int statusCode, String statusMessage, byte[] body){
         this(statusCode, statusMessage, body, "text/html;charset=utf-8");
     }
@@ -37,45 +35,14 @@ public class HTTPResponse {
         return httpResponse;
     }
 
-    public static HTTPResponse badRequest(){
-        HTTPStatus httpStatus = HTTPStatus.BAD_REQUEST;
-        String message = httpStatus.meesage();
-        return new HTTPResponse(httpStatus.code(), message, message.getBytes(StandardCharsets.UTF_8));
-    }
-
-    public static HTTPResponse notFound(){
-        HTTPStatus httpStatus = HTTPStatus.NOT_FOUND;
-        String message = httpStatus.meesage();
-        return new HTTPResponse(httpStatus.code(), message, message.getBytes(StandardCharsets.UTF_8));
-    }
-
-    public static HTTPResponse conflict(String errorMessage){
-        HTTPStatus httpStatus = HTTPStatus.CONFLICT;
-        String message = httpStatus.meesage() + "\n" + errorMessage;
-        return new HTTPResponse(httpStatus.code(), message, message.getBytes(StandardCharsets.UTF_8));
+    public static HTTPResponse error(HTTPStatus httpStatus, String message){
+        return new HTTPResponse(httpStatus.code(), httpStatus.meesage(), message.getBytes(StandardCharsets.UTF_8));
     }
 
     public static HTTPResponse internalServerError(){
         HTTPStatus httpStatus = HTTPStatus.INTERNAL_SERVER_ERROR;
         String message = httpStatus.meesage();
         return new HTTPResponse(httpStatus.code(), message, message.getBytes(StandardCharsets.UTF_8));
-    }
-
-    public static HTTPResponse methodNotAllowed(){
-        HTTPStatus httpStatus = HTTPStatus.METHOD_NOT_ALLOWED;
-        String message = httpStatus.meesage();
-        return new HTTPResponse(httpStatus.code(), message, message.getBytes(StandardCharsets.UTF_8));
-    }
-
-    public void setStatus(HTTPStatus status) {
-        this.statusCode = status.code();
-        this.statusMessage = status.meesage(); // 오타(meesage)는 기존 코드 유지함
-    }
-
-    public void setRedirect(String location) {
-        setStatus(HTTPStatus.REDIRECT);
-        addHeader("Location", location);
-        this.body = new byte[0];
     }
 
     public int getStatusCode() {
@@ -94,6 +61,5 @@ public class HTTPResponse {
     public Map<String, String> getHeaders() {
         return headers;
     }
-
 
 }

@@ -1,22 +1,17 @@
 package config;
 
-import application.db.UserDatabase;
+import db.UserDatabase;
 import application.handler.UserCreateHandler;
 import application.handler.UserLoginHandler;
 import application.handler.UserLogoutHandler;
 import application.service.UserService;
 import webserver.HandlerMapping;
-import webserver.RouteKey;
 import webserver.Dispatcher;
-import webserver.handler.Handler;
 import webserver.handler.StaticFileHandler;
 import webserver.http.HTTPMethod;
-import session.SessionManager;
+import webserver.session.SessionManager;
 import webserver.interceptor.InterceptorRegistry;
 import webserver.interceptor.LoginCheckInterceptor;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class AppConfig {
 
@@ -25,23 +20,27 @@ public class AppConfig {
 
     private final SessionManager sessionManager = new SessionManager();
 
-    private final StaticFileHandler staticFileHandler = new StaticFileHandler();
+    private final StaticFileHandler staticFileHandler = new StaticFileHandler(sessionManager);
     private final UserCreateHandler userCreateHandler = new UserCreateHandler(userService);
     private final UserLoginHandler userLoginHandler = new UserLoginHandler(userService, sessionManager);
     private final UserLogoutHandler userLogoutHandler = new UserLogoutHandler(sessionManager);
 
     private final LoginCheckInterceptor loginCheckInterceptor = new LoginCheckInterceptor(sessionManager);
 
-    private final HandlerMapping handlerMapping = new HandlerMapping(handleMap(), staticFileHandler);
+    private final HandlerMapping handlerMapping = new HandlerMapping(staticFileHandler);
 
-    private final InterceptorRegistry interceptorRegistry = configureInterceptors();
+    private final InterceptorRegistry interceptorRegistry;
+    private final Dispatcher dispatcher;
 
     public AppConfig() {
-        router();
+        this.interceptorRegistry = configureInterceptors();
+        registerHandler();
+
+        this.dispatcher = new Dispatcher(handlerMapping, interceptorRegistry);
     }
 
-    public Dispatcher router() {
-        return new Dispatcher(handlerMapping, interceptorRegistry);
+    public Dispatcher getDispatcher() {
+        return this.dispatcher;
     }
 
     private InterceptorRegistry configureInterceptors() {
@@ -55,11 +54,9 @@ public class AppConfig {
     }
 
     // Handlers
-    private Map<RouteKey, Handler> handleMap() {
-        Map<RouteKey, Handler> map = new HashMap<>();
-        map.put(new RouteKey(HTTPMethod.POST, "/user/create"), userCreateHandler);
-        map.put(new RouteKey(HTTPMethod.POST, "/user/login"), userLoginHandler);
-        map.put(new RouteKey(HTTPMethod.POST, "/user/logout"), userLogoutHandler);
-        return map;
+    private void registerHandler() {
+        handlerMapping.register(HTTPMethod.POST, "/user/create", userCreateHandler);
+        handlerMapping.register(HTTPMethod.POST, "/user/login", userLoginHandler);
+        handlerMapping.register(HTTPMethod.POST, "/user/logout", userLogoutHandler);
     }
 }

@@ -1,9 +1,8 @@
 package webserver.interceptor;
 
-import application.model.User;
-import session.SessionManager;
+import webserver.exception.UnauthorizedException;
+import webserver.session.SessionManager;
 import webserver.http.HTTPRequest;
-import webserver.http.HTTPResponse;
 
 public class LoginCheckInterceptor implements Interceptor{
     private final SessionManager sessionManager;
@@ -12,15 +11,11 @@ public class LoginCheckInterceptor implements Interceptor{
         this.sessionManager = sessionManager;
     }
     @Override
-    public boolean preHandle(HTTPRequest request, HTTPResponse response) {
+    public void preHandle(HTTPRequest request) {
         String sid = request.getSid();
-        if(sid != null){
-            User user = sessionManager.getUser(sid);
-            if(user != null){
-                return true;
-            }
+        if(sid != null && sessionManager.getUser(sid) != null){
+            return;
         }
-        response.setRedirect("/login/index.html");
-        return false;
+        throw UnauthorizedException.needLogin(request.getPath());
     }
 }
