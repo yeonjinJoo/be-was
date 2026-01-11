@@ -20,7 +20,7 @@ public class AppConfig {
 
     private final SessionManager sessionManager = new SessionManager();
 
-    private final StaticFileHandler staticFileHandler = new StaticFileHandler();
+    private final StaticFileHandler staticFileHandler = new StaticFileHandler(sessionManager);
     private final UserCreateHandler userCreateHandler = new UserCreateHandler(userService);
     private final UserLoginHandler userLoginHandler = new UserLoginHandler(userService, sessionManager);
     private final UserLogoutHandler userLogoutHandler = new UserLogoutHandler(sessionManager);
