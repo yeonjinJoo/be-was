@@ -1,5 +1,7 @@
 package webserver;
 
+import webserver.exception.MethodNotAllowedException;
+import webserver.exception.NotFoundException;
 import webserver.handler.StaticFileHandler;
 import webserver.http.HTTPMethod;
 import webserver.handler.Handler;
@@ -36,7 +38,7 @@ public class HandlerMapping {
         // 1. 정확히 path가 일치하는 경우
         List<RouteKey> directCandidates = directLookup.get(path);
         if(directCandidates != null){
-            return findHandlerInCandidates(directCandidates, method);
+            return findHandlerInCandidates(directCandidates, path, method);
         }
 
         // 2. path의 패턴이 일치하는 경우 eg. /user/create/{id}와 /user/create/1의 경우 일치
@@ -44,7 +46,7 @@ public class HandlerMapping {
                 .filter(key -> key.matches(path))
                 .toList();
         if(!patternCandidates.isEmpty()){
-            return findHandlerInCandidates(patternCandidates, method);
+            return findHandlerInCandidates(patternCandidates, path, method);
         }
 
         // 3. 아무것도 일치하지 않는 경우 정적파일 확인
@@ -52,15 +54,14 @@ public class HandlerMapping {
             return staticFileHandler;
         }
 
-        // TODO: 해당 요청을 처리할 수 있는 핸들러 없음 예외 처리 필요
-        throw new IllegalArgumentException("잘못된 요청입니다.");
+        throw NotFoundException.pageNotFound(path);
     }
 
-    private Handler findHandlerInCandidates(List<RouteKey> candidates, HTTPMethod method) {
+    private Handler findHandlerInCandidates(List<RouteKey> candidates, String path, HTTPMethod method) {
         return candidates.stream()
                 .filter(key -> key.method() == method)
                 .findFirst()
                 .map(handlerMap::get)
-                .orElseThrow(() -> new IllegalArgumentException("Method Not Allowed: " + method));
+                .orElseThrow(() -> MethodNotAllowedException.fromPath(path, method));
     }
 }

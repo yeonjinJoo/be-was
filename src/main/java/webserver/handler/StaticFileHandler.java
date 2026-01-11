@@ -1,5 +1,7 @@
 package webserver.handler;
 
+import webserver.exception.InternalServerException;
+import webserver.exception.NotFoundException;
 import webserver.http.ContentType;
 import webserver.http.HTTPRequest;
 import webserver.http.HTTPResponse;
@@ -13,24 +15,18 @@ public class StaticFileHandler implements Handler {
         byte[] body;
         String path = request.getPath();
 
-        try { // 200 - 정상 처리
-            String resolvedPath = resolvePath(path);
-            body = readFile(resolvedPath);
-            String contentType = ContentType.fromPath(resolvedPath).getContentType();
-            return HTTPResponse.ok(contentType, body);
-        } catch (FileNotFoundException e) { // 404 - 파일 존재 x
-            return HTTPResponse.notFound();
-        } catch (IOException e) { // 500 - 서버 오류
-            return HTTPResponse.internalServerError();
-        }
+        String resolvedPath = resolvePath(path);
+        body = readFile(resolvedPath);
+        String contentType = ContentType.fromPath(resolvedPath).getContentType();
+
+        return HTTPResponse.ok(contentType, body);
     }
 
-    private byte[] readFile(String path) throws IOException {
+    private byte[] readFile(String path) {
         File file = new File(path);
 
-        //위의 path에 파일이 존재하지 않는 경우
         if (!file.exists() || !file.isFile()) {
-            throw new FileNotFoundException("Resource not found: " + path);
+            throw NotFoundException.pageNotFound(path);
         }
 
         try (InputStream is = new FileInputStream(path)) {
@@ -43,6 +39,8 @@ public class StaticFileHandler implements Handler {
             }
 
             return baos.toByteArray();
+        } catch (IOException e){
+            throw InternalServerException.fileError();
         }
     }
 
