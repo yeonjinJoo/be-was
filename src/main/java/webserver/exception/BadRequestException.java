@@ -16,6 +16,6 @@ public class BadRequestException extends WebException{
     }
 
     public static BadRequestException invalidLogin(){
-        return new BadRequestException("아이디 또는 비밀번호가 잘못됐습니다. 다시 로그인해주세요.");
+        return new BadRequestException("아이디 또는 비밀번호가 일치하지 않습니다.");
     }
 }
