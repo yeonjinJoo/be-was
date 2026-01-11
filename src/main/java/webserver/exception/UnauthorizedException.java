@@ -7,7 +7,7 @@ public class UnauthorizedException extends WebException {
         super(HTTPStatus.UNAUTHORIZED, message);
     }
 
-    public UnauthorizedException needLogin(){
+    public static UnauthorizedException needLogin(){
         return new UnauthorizedException("로그인이 필요합니다.");
     }
 }
