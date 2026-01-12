@@ -48,7 +48,7 @@ public class AppConfig {
 
         // 로그인 체크 인터셉터 등록 및 경로 설정
         registry.addInterceptor(loginCheckInterceptor)
-                .addPathPatterns("/mypage/**", "/user/logout"); // 로그인이 필요한 페이지들
+                .addPathPatterns("/mypage/**", "/user/logout", "/article/**", "/main"); // 로그인이 필요한 페이지들
 
         return registry;
     }
