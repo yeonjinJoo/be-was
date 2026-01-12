@@ -1,9 +1,12 @@
 package config;
 
+import application.handler.PostCreateHandler;
+import application.repository.PostRepository;
 import application.repository.UserRepository;
 import application.handler.UserCreateHandler;
 import application.handler.UserLoginHandler;
 import application.handler.UserLogoutHandler;
+import application.service.PostService;
 import application.service.UserService;
 import webserver.HandlerMapping;
 import webserver.Dispatcher;
@@ -16,7 +19,10 @@ import webserver.interceptor.LoginCheckInterceptor;
 public class AppConfig {
 
     private final UserRepository userRepository = new UserRepository();
+    private final PostRepository postRepository = new PostRepository();
+
     private final UserService userService = new UserService(userRepository);
+    private final PostService postService = new PostService(postRepository);
 
     private final SessionManager sessionManager = new SessionManager();
 
@@ -24,6 +30,7 @@ public class AppConfig {
     private final UserCreateHandler userCreateHandler = new UserCreateHandler(userService);
     private final UserLoginHandler userLoginHandler = new UserLoginHandler(userService, sessionManager);
     private final UserLogoutHandler userLogoutHandler = new UserLogoutHandler(sessionManager);
+    private final PostCreateHandler postCreateHandler = new PostCreateHandler(postService, sessionManager);
 
     private final LoginCheckInterceptor loginCheckInterceptor = new LoginCheckInterceptor(sessionManager);
 
@@ -58,5 +65,6 @@ public class AppConfig {
         handlerMapping.register(HTTPMethod.POST, "/user/create", userCreateHandler);
         handlerMapping.register(HTTPMethod.POST, "/user/login", userLoginHandler);
         handlerMapping.register(HTTPMethod.POST, "/user/logout", userLogoutHandler);
+        handlerMapping.register(HTTPMethod.POST, "/article/create", postCreateHandler);
     }
 }
