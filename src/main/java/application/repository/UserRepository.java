@@ -19,7 +19,11 @@ public class UserRepository {
             pstmt.setString(2, user.getPassword());
             pstmt.setString(3, user.getName());
             pstmt.setString(4, user.getEmail());
-            pstmt.executeUpdate();
+
+            int affected = pstmt.executeUpdate();
+            if (affected != 1) {
+                throw new RuntimeException("사용자 저장 실패: affectedRows=" + affected);
+            }
         } catch (SQLException e){
             e.printStackTrace();
             throw new RuntimeException("데이터베이스 접근 에러 발생");
