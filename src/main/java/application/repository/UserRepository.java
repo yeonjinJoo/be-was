@@ -1,0 +1,81 @@
+package application.repository;
+
+import application.model.User;
+import config.DBConfig;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Optional;
+
+public class UserRepository {
+    public void addUser(User user){
+        String sql = "INSERT INTO users(userId, password, name, email) VALUES (?, ?, ?, ?)";
+
+        try(Connection conn = DBConfig.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setString(1, user.getUserId());
+            pstmt.setString(2, user.getPassword());
+            pstmt.setString(3, user.getName());
+            pstmt.setString(4, user.getEmail());
+            pstmt.executeUpdate();
+        } catch (SQLException e){
+            e.printStackTrace();
+            throw new RuntimeException("데이터베이스 접근 에러 발생");
+        }
+    }
+
+    public Optional<User> login(String userId,  String password){
+        String sql = "SELECT userId, password, name, email FROM users WHERE userId = ? AND password = ?";
+        try(Connection conn = DBConfig.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setString(1, userId);
+            pstmt.setString(2, password);
+
+            try(ResultSet rs = pstmt.executeQuery()){
+                if (!rs.next()) {
+                    return Optional.empty();
+                }
+
+                User user = new User(
+                        rs.getString("userId"),
+                        rs.getString("password"),
+                        rs.getString("name"),
+                        rs.getString("email")
+                );
+
+                return Optional.of(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("데이터베이스 접근 에러 발생");
+        }
+    }
+
+    public Optional<User> findUserById(String userId){
+        String sql = "SELECT userId, password, name, email FROM users WHERE userId = ?";
+        try(Connection conn = DBConfig.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setString(1, userId);
+
+            try(ResultSet rs = pstmt.executeQuery()){
+                if (!rs.next()) {
+                    return Optional.empty();
+                }
+
+                User user = new User(
+                        rs.getString("userId"),
+                        rs.getString("password"),
+                        rs.getString("name"),
+                        rs.getString("email")
+                );
+
+                return Optional.of(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("데이터베이스 접근 에러 발생");
+        }
+    }
+}

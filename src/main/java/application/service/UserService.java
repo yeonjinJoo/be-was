@@ -1,38 +1,32 @@
 package application.service;
 
-import db.UserDatabase;
+import application.repository.UserRepository;
 import application.model.User;
 import webserver.exception.BadRequestException;
 import webserver.exception.ConflictException;
 
-import java.util.Optional;
-
 public class UserService {
-    private final UserDatabase userDatabase;
+    private final UserRepository userRepository;
 
-    public UserService(UserDatabase userDatabase) {
-        this.userDatabase = userDatabase;
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     public void create(User user) {
         validDuplicateUser(user.getUserId());
-        userDatabase.addUser(user);
+        userRepository.addUser(user);
     }
 
     private void validDuplicateUser(String userId) {
-        userDatabase.findUserById(userId)
+        userRepository.findUserById(userId)
                 .ifPresent(user -> {
                     throw ConflictException.dupliacteUserId();
                 });
     }
 
     public User login(String userId, String password) {
-        User user = userDatabase.findUserById(userId)
+        User user = userRepository.login(userId, password)
                 .orElseThrow(() -> BadRequestException.invalidLogin());
-
-        if(!user.getPassword().equals(password)){
-            throw BadRequestException.invalidLogin();
-        }
 
         return user;
     }

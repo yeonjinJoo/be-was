@@ -1,6 +1,6 @@
 package config;
 
-import db.UserDatabase;
+import application.repository.UserRepository;
 import application.handler.UserCreateHandler;
 import application.handler.UserLoginHandler;
 import application.handler.UserLogoutHandler;
@@ -15,8 +15,8 @@ import webserver.interceptor.LoginCheckInterceptor;
 
 public class AppConfig {
 
-    private final UserDatabase userDatabase = new UserDatabase();
-    private final UserService userService = new UserService(userDatabase);
+    private final UserRepository userRepository = new UserRepository();
+    private final UserService userService = new UserService(userRepository);
 
     private final SessionManager sessionManager = new SessionManager();
 
