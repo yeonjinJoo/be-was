@@ -5,9 +5,9 @@ import application.service.UserService;
 import webserver.exception.BadRequestException;
 import webserver.handler.DynamicHandler;
 import webserver.http.HTTPRequest;
-import webserver.http.HTTPResponse;
 import webserver.session.CookieUtils;
 import webserver.session.SessionManager;
+import webserver.view.ModelAndView;
 
 import java.util.Map;
 
@@ -22,7 +22,7 @@ public class UserLoginHandler extends DynamicHandler {
     }
 
     @Override
-    public HTTPResponse handle(HTTPRequest request) {
+    public ModelAndView handle(HTTPRequest request) {
         Map<String, String> bodyParams = request.getBodyParams();
         if(!isValidLogin(bodyParams)) {
             throw BadRequestException.missingParameters();
@@ -30,9 +30,9 @@ public class UserLoginHandler extends DynamicHandler {
 
         User user = userService.login(bodyParams.get("userId"), bodyParams.get("password"));
         String sid = sessionManager.createSession(user);
-        HTTPResponse response = HTTPResponse.redirect("/main");
-        response.addHeader("Set-Cookie", CookieUtils.buildSetCookieSid(sid));
-        return response;
+        ModelAndView modelAndView = new ModelAndView("redirect:/index.html");
+        modelAndView.addHeader("Set-Cookie", CookieUtils.buildSetCookieSid(sid));
+        return modelAndView;
     }
 
     private boolean isValidLogin(Map<String, String> qp) {

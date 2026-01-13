@@ -5,8 +5,8 @@ import application.service.PostService;
 import webserver.exception.BadRequestException;
 import webserver.handler.DynamicHandler;
 import webserver.http.HTTPRequest;
-import webserver.http.HTTPResponse;
 import webserver.session.SessionManager;
+import webserver.view.ModelAndView;
 
 import java.util.Map;
 
@@ -20,13 +20,13 @@ public class PostCreateHandler extends DynamicHandler {
     }
 
     @Override
-    public HTTPResponse handle(HTTPRequest request) {
+    public ModelAndView handle(HTTPRequest request) {
         String sid = request.getSid();
         int authorId = sessionManager.getUser(sid).getId();
 
         Post post = createPost(request, authorId);
         postService.create(post);
-        return HTTPResponse.redirect("/main");
+        return new ModelAndView("redirect:/index.html");
     }
 
     private Post createPost(HTTPRequest request, int authorId) {

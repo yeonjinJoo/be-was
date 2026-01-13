@@ -62,8 +62,7 @@ public class RequestHandler implements Runnable {
                 }
 
                 logRequestHeaders(httpRequest);
-                HTTPResponse httpResponse = dispatcher.dispatch(httpRequest);
-                httpResponseWriter.write(dos, httpRequest.getVersion(), httpResponse);
+                dispatcher.dispatch(httpRequest, dos, httpResponseWriter);
 
                 requestCount++;
             } catch (SocketTimeoutException e){ // connection 타임아웃

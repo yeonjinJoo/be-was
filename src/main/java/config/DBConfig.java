@@ -8,11 +8,9 @@ public class DBConfig {
     private static final String PASSWORD = "";
 
     public static void init() {
-        String dropPosts = "DROP TABLE IF EXISTS POST";
-        String dropUsers = "DROP TABLE IF EXISTS USERS";
 
         String createUsers = """
-        CREATE TABLE USERS (
+        CREATE TABLE IF NOT EXISTS TABLE USERS (
             id BIGINT AUTO_INCREMENT PRIMARY KEY,
             user_id VARCHAR(255) NOT NULL UNIQUE,
             name VARCHAR(255) NOT NULL UNIQUE,
@@ -22,7 +20,7 @@ public class DBConfig {
         """;
 
         String createPost = """
-        CREATE TABLE POST (
+        CREATE TABLE IF NOT EXISTS TABLE POST (
             post_id BIGINT AUTO_INCREMENT PRIMARY KEY,
             content TEXT NOT NULL,
             author_id BIGINT NOT NULL,
@@ -35,9 +33,6 @@ public class DBConfig {
 
         try (Connection conn = DBConfig.getConnection();
              Statement stmt = conn.createStatement()) {
-
-            stmt.execute(dropPosts);
-            stmt.execute(dropUsers);
 
             stmt.execute(createUsers);
             stmt.execute(createPost);

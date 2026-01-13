@@ -5,7 +5,8 @@ import application.service.UserService;
 import webserver.exception.BadRequestException;
 import webserver.handler.DynamicHandler;
 import webserver.http.HTTPRequest;
-import webserver.http.HTTPResponse;
+import webserver.view.ModelAndView;
+
 import java.util.Map;
 
 public class UserCreateHandler extends DynamicHandler {
@@ -16,10 +17,11 @@ public class UserCreateHandler extends DynamicHandler {
     }
 
     @Override
-    public HTTPResponse handle(HTTPRequest request) {
+    public ModelAndView handle(HTTPRequest request) {
         User user = createUser(request);
         userService.create(user);
-        return HTTPResponse.redirect("/login");
+
+        return new ModelAndView("redirect:/login");
     }
 
     private User createUser(HTTPRequest request) {

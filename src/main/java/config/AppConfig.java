@@ -1,13 +1,10 @@
 package config;
 
-import application.handler.PostCreateHandler;
+import application.handler.*;
 import application.repository.H2PostRepository;
 import application.repository.H2UserRepository;
 import application.repository.PostRepository;
 import application.repository.UserRepository;
-import application.handler.UserCreateHandler;
-import application.handler.UserLoginHandler;
-import application.handler.UserLogoutHandler;
 import application.service.PostService;
 import application.service.UserService;
 import webserver.HandlerMapping;
@@ -33,6 +30,7 @@ public class AppConfig {
     private final UserLoginHandler userLoginHandler = new UserLoginHandler(userService, sessionManager);
     private final UserLogoutHandler userLogoutHandler = new UserLogoutHandler(sessionManager);
     private final PostCreateHandler postCreateHandler = new PostCreateHandler(postService, sessionManager);
+    private final MainPageHandler mainPageHandler = new MainPageHandler();
 
     private final LoginCheckInterceptor loginCheckInterceptor = new LoginCheckInterceptor(sessionManager);
 
@@ -66,9 +64,12 @@ public class AppConfig {
 
     // Handlers
     private void registerHandler() {
+        // TODO: IndexPageHandler 추가
+        // TODO: StaticHandler 삭제 - ViewResolver로 통합
         handlerMapping.register(HTTPMethod.POST, "/user/create", userCreateHandler);
         handlerMapping.register(HTTPMethod.POST, "/user/login", userLoginHandler);
         handlerMapping.register(HTTPMethod.POST, "/user/logout", userLogoutHandler);
         handlerMapping.register(HTTPMethod.POST, "/article/create", postCreateHandler);
+        handlerMapping.register(HTTPMethod.GET, "/", mainPageHandler);
     }
 }

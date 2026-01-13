@@ -1,8 +1,8 @@
 package webserver.handler;
 
 import webserver.http.HTTPRequest;
-import webserver.http.HTTPResponse;
+import webserver.view.ModelAndView;
 
 public abstract class DynamicHandler implements Handler{
-    public abstract HTTPResponse handle(HTTPRequest request);
+    public abstract ModelAndView handle(HTTPRequest request);
 }

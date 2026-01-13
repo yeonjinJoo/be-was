@@ -5,6 +5,7 @@ import webserver.session.SessionManager;
 import webserver.handler.DynamicHandler;
 import webserver.http.HTTPRequest;
 import webserver.http.HTTPResponse;
+import webserver.view.ModelAndView;
 
 public class UserLogoutHandler extends DynamicHandler {
     private final SessionManager sessionManager;
@@ -14,12 +15,12 @@ public class UserLogoutHandler extends DynamicHandler {
     }
 
     @Override
-    public HTTPResponse handle(HTTPRequest request) {
+    public ModelAndView handle(HTTPRequest request) {
         String sid = request.getSid();
 
         sessionManager.invalidate(sid);
-        HTTPResponse response = HTTPResponse.redirect("/index.html");
-        response.addHeader("Set-Cookie", CookieUtils.buildExpireSidCookie(sid));
-        return response;
+        ModelAndView modelAndView = new ModelAndView("redirect:/index.html");
+        modelAndView.addHeader("Set-Cookie", CookieUtils.buildExpireSidCookie(sid));
+        return modelAndView;
     }
 }
