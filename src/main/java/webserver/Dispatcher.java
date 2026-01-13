@@ -51,14 +51,33 @@ public class Dispatcher {
         }
     }
 
-    public HTTPResponse handleWebException(WebException e, HTTPRequest request){
-        if(e instanceof UnauthorizedException ||
-                e instanceof BadRequestException ||
-                e instanceof ConflictException){
-            String encodedMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
-            return HTTPResponse.redirect("/login/index.html?error=true&message=" + encodedMessage);
+    public HTTPResponse handleWebException(WebException e, HTTPRequest request) {
+        String redirectPath = getRedirectPath(e);
+
+        if (redirectPath != null) {
+            return redirectWithError(redirectPath, e);
         }
 
         return HTTPResponse.error(e.getStatus(), e.getMessage());
     }
+
+    private String getRedirectPath(WebException e) {
+        if (e instanceof UnauthorizedException ||
+                e instanceof BadRequestException) {
+            return "/login/index.html";
+        }
+        if (e instanceof ConflictException) {
+            return "/registration/index.html";
+        }
+        return null;
+    }
+
+    private HTTPResponse redirectWithError(String path, WebException e) {
+        String encodedMessage =
+                URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+        return HTTPResponse.redirect(
+                path + "?error=true&message=" + encodedMessage
+        );
+    }
+
 }

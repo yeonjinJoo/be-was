@@ -80,5 +80,22 @@
         </form>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('error') === 'true') {
+        const encodedMessage = urlParams.get('message');
+
+        if (encodedMessage) {
+          const decodedMessage = decodeURIComponent(encodedMessage);
+
+          alert(decodedMessage);
+
+          const cleanUrl = window.location.origin + window.location.pathname;
+          window.history.replaceState({}, document.title, cleanUrl);
+        }
+      }
+    });
+</script>
 </body>
 </html>

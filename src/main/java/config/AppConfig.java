@@ -1,6 +1,8 @@
 package config;
 
 import application.handler.PostCreateHandler;
+import application.repository.H2PostRepository;
+import application.repository.H2UserRepository;
 import application.repository.PostRepository;
 import application.repository.UserRepository;
 import application.handler.UserCreateHandler;
@@ -18,8 +20,8 @@ import webserver.interceptor.LoginCheckInterceptor;
 
 public class AppConfig {
 
-    private final UserRepository userRepository = new UserRepository();
-    private final PostRepository postRepository = new PostRepository();
+    private final UserRepository userRepository = new H2UserRepository();
+    private final PostRepository postRepository = new H2PostRepository();
 
     private final UserService userService = new UserService(userRepository);
     private final PostService postService = new PostService(postRepository);
@@ -44,6 +46,8 @@ public class AppConfig {
         registerHandler();
 
         this.dispatcher = new Dispatcher(handlerMapping, interceptorRegistry);
+
+        DBConfig.init();
     }
 
     public Dispatcher getDispatcher() {
