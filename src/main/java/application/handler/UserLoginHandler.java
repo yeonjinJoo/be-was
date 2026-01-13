@@ -30,7 +30,7 @@ public class UserLoginHandler extends DynamicHandler {
 
         User user = userService.login(bodyParams.get("userId"), bodyParams.get("password"));
         String sid = sessionManager.createSession(user);
-        HTTPResponse response = HTTPResponse.redirect("/");
+        HTTPResponse response = HTTPResponse.redirect("/main");
         response.addHeader("Set-Cookie", CookieUtils.buildSetCookieSid(sid));
         return response;
     }

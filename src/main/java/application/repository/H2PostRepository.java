@@ -14,7 +14,7 @@ public class H2PostRepository implements PostRepository {
         try(Connection conn = DBConfig.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)){
             pstmt.setString(1, post.getContent());
-            pstmt.setString(2, post.getUserId());
+            pstmt.setInt(2, post.getAuthorId());
 
             int affected = pstmt.executeUpdate();
             if (affected != 1) {

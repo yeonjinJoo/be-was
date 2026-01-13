@@ -26,6 +26,7 @@ public class DBConfig {
             post_id BIGINT AUTO_INCREMENT PRIMARY KEY,
             content TEXT NOT NULL,
             author_id BIGINT NOT NULL,
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             CONSTRAINT fk_post_user
                 FOREIGN KEY (author_id)
                 REFERENCES USERS(id)

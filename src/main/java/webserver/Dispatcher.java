@@ -39,7 +39,6 @@ public class Dispatcher {
             for (Interceptor interceptor : interceptors) {
                 interceptor.preHandle(request);
             }
-
             return handler.handle(request);
 
         } catch (WebException e){

@@ -31,7 +31,7 @@ public class H2UserRepository implements UserRepository{
     }
 
     public Optional<User> login(String userId){
-        String sql = "SELECT user_id, password, name, email FROM users WHERE user_id = ?";
+        String sql = "SELECT id, user_id, password, name, email FROM users WHERE user_id = ?";
         try(Connection conn = DBConfig.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)){
             pstmt.setString(1, userId);
@@ -42,6 +42,7 @@ public class H2UserRepository implements UserRepository{
                 }
 
                 User user = new User(
+                        rs.getInt("id"),
                         rs.getString("user_id"),
                         rs.getString("password"),
                         rs.getString("name"),

@@ -88,12 +88,7 @@ public class StaticFileHandler implements Handler {
         String html = new String(body, StandardCharsets.UTF_8);
         User user = sessionManager.getUser(request.getSid());
 
-        String fragment;
-        if (user != null) { // 로그인 완료 상태
-            fragment = readFragment("nav_user.html").replace("{{userName}}", user.getName());
-        } else { // 비로그인 상태
-            fragment = readFragment("nav_login.html");
-        }
+        String fragment = readFragment("nav_user.html").replace("{{userName}}", user.getName());
 
         Map<String, String> data = new HashMap<>();
         data.put("userStatus", fragment);

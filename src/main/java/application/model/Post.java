@@ -1,19 +1,23 @@
 package application.model;
 
+import java.time.LocalDateTime;
+
 public class Post {
     private Integer id;
     private String content;
-    private String userId;
+    private int authorId;
+    private LocalDateTime createdAt;
 
-    public Post(String content, String userId) {
+    public Post(String content, int authorId) {
         this.content = content;
-        this.userId = userId;
+        this.authorId = authorId;
     }
 
-    public Post(Integer id, String content, String userId) {
+    public Post(Integer id, String content, int authorId, LocalDateTime createdAt) {
         this.id = id;
         this.content = content;
-        this.userId = userId;
+        this.authorId = authorId;
+        this.createdAt = createdAt;
     }
 
     public Integer getId() {
@@ -22,8 +26,12 @@ public class Post {
     public String getContent() {
         return content;
     }
-    public String getUserId() {
-        return userId;
+    public int getAuthorId() {
+        return authorId;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
 }

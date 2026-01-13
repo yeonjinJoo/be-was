@@ -22,20 +22,20 @@ public class PostCreateHandler extends DynamicHandler {
     @Override
     public HTTPResponse handle(HTTPRequest request) {
         String sid = request.getSid();
-        String userId = sessionManager.getUser(sid).getUserId();
+        int authorId = sessionManager.getUser(sid).getId();
 
-        Post post = createPost(request, userId);
+        Post post = createPost(request, authorId);
         postService.create(post);
-        return HTTPResponse.redirect("/index.html");
+        return HTTPResponse.redirect("/main");
     }
 
-    private Post createPost(HTTPRequest request, String userId) {
+    private Post createPost(HTTPRequest request, int authorId) {
         Map<String, String> bodyParams = request.getBodyParams();
         if(!isValidCreateParams(bodyParams)) {
             throw BadRequestException.missingParameters();
         }
 
-        Post post = new Post(bodyParams.get("content"), userId);
+        Post post = new Post(bodyParams.get("content"), authorId);
         return post;
     }
 
