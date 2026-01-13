@@ -73,11 +73,16 @@ public class Dispatcher {
     }
 
     private HTTPResponse redirectWithError(String path, WebException e) {
-        String encodedMessage =
-                URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
-        return HTTPResponse.redirect(
-                path + "?error=true&message=" + encodedMessage
-        );
+        StringBuilder url = new StringBuilder(path);
+        url.append("?error=true&message=")
+                .append(URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8));
+
+        if (e.getCode() != null) {
+            url.append("&code=")
+                    .append(URLEncoder.encode(e.getCode(), StandardCharsets.UTF_8));
+        }
+
+        return HTTPResponse.redirect(url.toString());
     }
 
 }

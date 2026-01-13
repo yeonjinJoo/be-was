@@ -19,7 +19,7 @@ public class UserCreateHandler extends DynamicHandler {
     public HTTPResponse handle(HTTPRequest request) {
         User user = createUser(request);
         userService.create(user);
-        return HTTPResponse.redirect("/index.html");
+        return HTTPResponse.redirect("/login");
     }
 
     private User createUser(HTTPRequest request) {

@@ -6,7 +6,9 @@ import java.util.Optional;
 public interface UserRepository {
     public void addUser(User user);
 
-    public Optional<User> login(String userId,  String password);
+    public Optional<User> login(String userId);
 
-    public Optional<User> findUserById(String userId);
+    public boolean existsByUserId(String userId);
+
+    public boolean existsByUserName(String name);
 }

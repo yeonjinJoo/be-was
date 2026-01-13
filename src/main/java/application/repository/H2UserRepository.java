@@ -30,34 +30,7 @@ public class H2UserRepository implements UserRepository{
         }
     }
 
-    public Optional<User> login(String userId, String password){
-        String sql = "SELECT user_id, password, name, email FROM users WHERE user_id = ? AND password = ?";
-        try(Connection conn = DBConfig.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql)){
-            pstmt.setString(1, userId);
-            pstmt.setString(2, password);
-
-            try(ResultSet rs = pstmt.executeQuery()){
-                if (!rs.next()) {
-                    return Optional.empty();
-                }
-
-                User user = new User(
-                        rs.getString("user_id"),
-                        rs.getString("password"),
-                        rs.getString("name"),
-                        rs.getString("email")
-                );
-
-                return Optional.of(user);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException("데이터베이스 접근 에러 발생");
-        }
-    }
-
-    public Optional<User> findUserById(String userId){
+    public Optional<User> login(String userId){
         String sql = "SELECT user_id, password, name, email FROM users WHERE user_id = ?";
         try(Connection conn = DBConfig.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)){
@@ -80,6 +53,36 @@ public class H2UserRepository implements UserRepository{
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("데이터베이스 접근 에러 발생");
+        }
+    }
+
+    public boolean existsByUserId(String userId){
+        String sql = "SELECT 1 FROM users WHERE user_id = ?";
+        try (Connection conn = DBConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, userId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("데이터베이스 접근 에러 발생", e);
+        }
+    }
+
+    public boolean existsByUserName(String userName){
+        String sql = "SELECT 1 FROM users WHERE name = ?";
+        try (Connection conn = DBConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, userName);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("데이터베이스 접근 에러 발생", e);
         }
     }
 }

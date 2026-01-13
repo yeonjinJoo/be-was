@@ -59,21 +59,30 @@
   </div>
 </div>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('error') === 'true') {
-        const encodedMessage = urlParams.get('message');
+  document.addEventListener('DOMContentLoaded', function () {
+    const params = new URLSearchParams(location.search);
 
-        if (encodedMessage) {
-          const decodedMessage = decodeURIComponent(encodedMessage);
+    const error = params.get('error');
+    const code = params.get('code');
+    const message = params.get('message');
 
-          alert(decodedMessage);
+    if (error === 'true' && code === 'userNotFound' && message) {
+      const goRegister = confirm(decodeURIComponent(message));
 
-          const cleanUrl = window.location.origin + window.location.pathname;
-          window.history.replaceState({}, document.title, cleanUrl);
-        }
+      if (goRegister) {
+        let url = '/registration';
+        window.location.href = url;
       }
-    });
+    }
+
+    else if (error === 'true' && message) {
+      alert(decodeURIComponent(message));
+    }
+
+    if (error === 'true') {
+      history.replaceState({}, document.title, location.pathname);
+    }
+  });
 </script>
 </body>
 </html>
