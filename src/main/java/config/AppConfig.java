@@ -25,12 +25,14 @@ public class AppConfig {
 
     private final SessionManager sessionManager = new SessionManager();
 
-    private final StaticFileHandler staticFileHandler = new StaticFileHandler(sessionManager);
+    // TODO: 로그인 상태면 handler에게 handle 넘길 때 sessionManager가 받아온 User 함께 넘기게 하기
+    private final StaticFileHandler staticFileHandler = new StaticFileHandler();
     private final UserCreateHandler userCreateHandler = new UserCreateHandler(userService);
     private final UserLoginHandler userLoginHandler = new UserLoginHandler(userService, sessionManager);
     private final UserLogoutHandler userLogoutHandler = new UserLogoutHandler(sessionManager);
     private final PostCreateHandler postCreateHandler = new PostCreateHandler(postService, sessionManager);
-    private final MainPageHandler mainPageHandler = new MainPageHandler();
+    private final MainPageHandler mainPageHandler = new MainPageHandler(sessionManager);
+    private final MyPageHandler myPageHandler = new MyPageHandler(sessionManager);
 
     private final LoginCheckInterceptor loginCheckInterceptor = new LoginCheckInterceptor(sessionManager);
 
@@ -64,12 +66,13 @@ public class AppConfig {
 
     // Handlers
     private void registerHandler() {
-        // TODO: IndexPageHandler 추가
-        // TODO: StaticHandler 삭제 - ViewResolver로 통합
+        // TODO: MainPageHandler 추가
         handlerMapping.register(HTTPMethod.POST, "/user/create", userCreateHandler);
         handlerMapping.register(HTTPMethod.POST, "/user/login", userLoginHandler);
         handlerMapping.register(HTTPMethod.POST, "/user/logout", userLogoutHandler);
         handlerMapping.register(HTTPMethod.POST, "/article/create", postCreateHandler);
+        handlerMapping.register(HTTPMethod.GET, "/mypage", myPageHandler);
         handlerMapping.register(HTTPMethod.GET, "/", mainPageHandler);
+        handlerMapping.register(HTTPMethod.GET, "/index.html", mainPageHandler);
     }
 }

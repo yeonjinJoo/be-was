@@ -10,7 +10,7 @@ public class DBConfig {
     public static void init() {
 
         String createUsers = """
-        CREATE TABLE IF NOT EXISTS TABLE USERS (
+        CREATE TABLE IF NOT EXISTS USERS (
             id BIGINT AUTO_INCREMENT PRIMARY KEY,
             user_id VARCHAR(255) NOT NULL UNIQUE,
             name VARCHAR(255) NOT NULL UNIQUE,
@@ -20,7 +20,7 @@ public class DBConfig {
         """;
 
         String createPost = """
-        CREATE TABLE IF NOT EXISTS TABLE POST (
+        CREATE TABLE IF NOT EXISTS POST (
             post_id BIGINT AUTO_INCREMENT PRIMARY KEY,
             content TEXT NOT NULL,
             author_id BIGINT NOT NULL,
@@ -42,7 +42,6 @@ public class DBConfig {
             throw new RuntimeException("데이터베이스 테이블 초기화 에러", e);
         }
     }
-
 
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);

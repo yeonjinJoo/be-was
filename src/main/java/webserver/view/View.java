@@ -22,10 +22,10 @@ public interface View {
 
 class TemplateView implements View {
     private static final String TEMPLATE_PATH = "./src/main/resources/template";
-    private final String resolvedPath;
+    private final String finalPath;
 
-    public TemplateView(String resolvedPath) {
-        this.resolvedPath = resolvedPath;
+    public TemplateView(String finalPath) {
+        this.finalPath = finalPath;
     }
 
     @Override
@@ -34,9 +34,9 @@ class TemplateView implements View {
                        Map<String, String> headers,
                        DataOutputStream dos,
                        HTTPResponseWriter writer) throws Exception {
-        String html = readFile(resolvedPath);
+        String html = readFile(finalPath);
 
-        String combinedHtml = combineFragments(html);
+        String combinedHtml = combineFragments(html, model);
 
         String renderedHtml = TemplateEngine.render(combinedHtml, model);
         HTTPResponse httpResponse = HTTPResponse.ok("text/html", renderedHtml.getBytes());
@@ -44,7 +44,7 @@ class TemplateView implements View {
         writer.write(dos, version, httpResponse);
     }
 
-    private String combineFragments(String html) throws Exception {
+    private String combineFragments(String html, Map<String, Object> model) throws Exception {
         // HTML 내의 {{include:filename}} 패턴을 찾아서 치환 (fragment로 나눠놓은 부분)
         Pattern includePattern = Pattern.compile("\\{\\{include:(.+?)\\}\\}");
         Matcher matcher = includePattern.matcher(html);
@@ -52,16 +52,19 @@ class TemplateView implements View {
 
         while (matcher.find()) {
             String fileName = matcher.group(1).trim();
+            if(model.containsKey(fileName)) {
+                fileName = (String)model.get(fileName);
+            }
             String fragmentContent = readFile(TEMPLATE_PATH + "/fragment/" + fileName);
             // 조각 안에도 또 조각 재귀적으로 처리
-            matcher.appendReplacement(sb, Matcher.quoteReplacement(combineFragments(fragmentContent)));
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(combineFragments(fragmentContent, model)));
         }
         matcher.appendTail(sb);
         return sb.toString();
     }
 
     private String readFile(String fileName) throws IOException {
-        return Files.readString(Paths.get(TEMPLATE_PATH, fileName), StandardCharsets.UTF_8);
+        return Files.readString(Paths.get(fileName), StandardCharsets.UTF_8);
     }
 }
 

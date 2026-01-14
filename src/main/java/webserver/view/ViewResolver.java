@@ -18,10 +18,11 @@ public class ViewResolver {
         }
 
         // 2. Template
-        String templatePath = resolvePath(TEMPLATE_PATH, viewName);
-
-        if (Files.exists(Paths.get(templatePath))) {
-            return new TemplateView(Files.readString(Paths.get(templatePath)));
+        if(viewName.startsWith("template:")){
+            String templatePath = resolvePath(TEMPLATE_PATH, viewName.substring(9));
+            if (Files.exists(Paths.get(templatePath))) {
+                return new TemplateView(templatePath);
+            }
         }
 
         // 3. Static file
