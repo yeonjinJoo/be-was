@@ -27,7 +27,7 @@ public class UserCreateHandler extends DynamicHandler {
     private User createUser(HTTPRequest request) {
         Map<String, String> bodyParams = request.getBodyParams();
         if(!isValidCreateParams(bodyParams)) {
-            throw BadRequestException.missingParameters();
+            throw BadRequestException.invalidParameters();
         }
 
         User user = new User(bodyParams.get("userId"),
@@ -40,10 +40,15 @@ public class UserCreateHandler extends DynamicHandler {
     private boolean isValidCreateParams(Map<String, String> qp) {
         if (qp == null || qp.isEmpty()) return false;
 
-        return isPresent(qp, "userId")
-                && isPresent(qp, "password")
-                && isPresent(qp, "name")
-                && isPresent(qp, "email");
+        boolean isExist = isPresent(qp, "userId")
+                        && isPresent(qp, "password")
+                        && isPresent(qp, "name")
+                        && isPresent(qp, "email");
+
+        if(isExist) {
+            return userService.isValidLength(qp.get("userId"), qp.get("password"), qp.get("name"), qp.get("email"));
+        }
+        return false;
     }
 
     private boolean isPresent(Map<String, String> qp, String key) {

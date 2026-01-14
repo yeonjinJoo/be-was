@@ -18,15 +18,15 @@ public class UserService {
         userRepository.addUser(user);
     }
 
-    private void validDuplicateUser(String userId) {
+    public void validDuplicateUser(String userId) {
         if(userRepository.existsByUserId(userId)) {
             throw ConflictException.duplicateUserId();
         }
     }
 
-    private void validDuplicateName(String name){
+    public void validDuplicateName(String name){
         if(userRepository.existsByUserName(name)){
-            throw ConflictException.dupliacteUserName();
+            throw ConflictException.duplicateUserName();
         }
     }
 
@@ -39,5 +39,14 @@ public class UserService {
         }
 
         return user;
+    }
+
+    public boolean isValidLength(String... values){
+        for(String value : values){
+            if(value.length() < 4){
+                return false;
+            }
+        }
+        return true;
     }
 }
