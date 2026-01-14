@@ -1,6 +1,6 @@
 package webserver.interceptor;
 
-import webserver.exception.UnauthorizedException;
+import webserver.exception.webexception.UnauthorizedException;
 import webserver.session.SessionManager;
 import webserver.http.HTTPRequest;
 

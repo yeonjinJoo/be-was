@@ -2,10 +2,11 @@ package application.service;
 
 import application.repository.UserRepository;
 import application.model.User;
-import webserver.exception.BadRequestException;
-import webserver.exception.ConflictException;
+import webserver.exception.webexception.BadRequestException;
+import webserver.exception.webexception.ConflictException;
 
 public class UserService {
+    private static final String LOGIN_PAGE = "/login/index.html";
     private final UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
@@ -13,21 +14,17 @@ public class UserService {
     }
 
     public void create(User user) {
-        validDuplicateUser(user.getUserId());
-        validDuplicateName(user.getName());
+        if(isDuplicateUser(user.getUserId())) throw ConflictException.duplicateUserId(LOGIN_PAGE);
+        if(isDuplicateName(user.getName())) throw ConflictException.duplicateUserName(LOGIN_PAGE);
         userRepository.addUser(user);
     }
 
-    public void validDuplicateUser(String userId) {
-        if(userRepository.existsByUserId(userId)) {
-            throw ConflictException.duplicateUserId();
-        }
+    public boolean isDuplicateUser(String userId) {
+        return userRepository.existsByUserId(userId) ? true : false;
     }
 
-    public void validDuplicateName(String name){
-        if(userRepository.existsByUserName(name)){
-            throw ConflictException.duplicateUserName();
-        }
+    public boolean isDuplicateName(String name){
+        return userRepository.existsByUserName(name) ? true : false;
     }
 
     public User login(String userId, String password) {

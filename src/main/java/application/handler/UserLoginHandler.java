@@ -2,7 +2,7 @@ package application.handler;
 
 import application.model.User;
 import application.service.UserService;
-import webserver.exception.BadRequestException;
+import webserver.exception.webexception.BadRequestException;
 import webserver.handler.DynamicHandler;
 import webserver.http.HTTPRequest;
 import webserver.session.CookieUtils;

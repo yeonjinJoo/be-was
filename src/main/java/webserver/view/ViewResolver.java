@@ -1,6 +1,6 @@
 package webserver.view;
 
-import webserver.exception.NotFoundException;
+import webserver.exception.httpexception.NotFoundException;
 import webserver.http.ContentType;
 
 import java.io.File;
@@ -18,16 +18,13 @@ public class ViewResolver {
         }
 
         // 2. Template
-        if(viewName.startsWith("template:")){
-            String templatePath = resolvePath(TEMPLATE_PATH, viewName.substring(9));
-            if (Files.exists(Paths.get(templatePath))) {
-                return new TemplateView(templatePath);
-            }
+        String templatePath = resolvePath(TEMPLATE_PATH, viewName);
+        if(Files.exists(Paths.get(templatePath))){
+            return new TemplateView(templatePath);
         }
 
         // 3. Static file
         String staticPath = resolvePath(STATIC_PATH, viewName);
-
         if (Files.exists(Paths.get(staticPath))) {
             String contentType = ContentType.fromPath(staticPath).getContentType();
             return new StaticView(Files.readAllBytes(Paths.get(staticPath)), contentType);

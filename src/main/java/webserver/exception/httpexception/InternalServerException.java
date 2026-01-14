@@ -1,8 +1,9 @@
-package webserver.exception;
+package webserver.exception.httpexception;
 
+import webserver.exception.webexception.WebException;
 import webserver.http.HTTPStatus;
 
-public class InternalServerException extends WebException {
+public class InternalServerException extends HTTPException {
     public InternalServerException(String message) {
         super(HTTPStatus.INTERNAL_SERVER_ERROR, message);
     }

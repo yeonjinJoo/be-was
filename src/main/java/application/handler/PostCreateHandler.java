@@ -2,7 +2,7 @@ package application.handler;
 
 import application.model.Post;
 import application.service.PostService;
-import webserver.exception.BadRequestException;
+import webserver.exception.webexception.BadRequestException;
 import webserver.handler.DynamicHandler;
 import webserver.http.HTTPRequest;
 import webserver.session.SessionManager;

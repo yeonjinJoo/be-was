@@ -2,7 +2,7 @@ package application.handler;
 
 import application.model.User;
 import application.service.UserService;
-import webserver.exception.BadRequestException;
+import webserver.exception.webexception.BadRequestException;
 import webserver.handler.DynamicHandler;
 import webserver.http.HTTPRequest;
 import webserver.view.ModelAndView;
@@ -27,7 +27,7 @@ public class UserCreateHandler extends DynamicHandler {
     private User createUser(HTTPRequest request) {
         Map<String, String> bodyParams = request.getBodyParams();
         if(!isValidCreateParams(bodyParams)) {
-            throw BadRequestException.invalidParameters();
+            throw BadRequestException.invalidParameters("/registration/index.html");
         }
 
         User user = new User(bodyParams.get("userId"),

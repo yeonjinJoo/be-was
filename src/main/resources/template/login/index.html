@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="../reset.css" rel="stylesheet" />
-  <link href="../global.css" rel="stylesheet" />
+  <link href="/reset.css" rel="stylesheet" />
+  <link href="/global.css" rel="stylesheet" />
 </head>
 <body>
 <div class="container">
   <header class="header">
-    <a href="/"><img src="../img/signiture.svg" /></a>
+    <a href="/"><img src="/img/signiture.svg" /></a>
     <ul class="header__menu">
       <li class="header__menu__item">
         <a class="btn btn_contained btn_size_s" href="/login">로그인</a>
@@ -24,6 +24,23 @@
 
   <div class="page">
     <h2 class="page-title">로그인</h2>
+      {{#hasError}}
+      <script>
+          const message = decodeURIComponent("{{errorMessage}}");
+
+          const isUserNotFound = "{{isUserNotFound}}" === "true";
+
+          if (isUserNotFound) {
+              if (confirm(message)) {
+                  window.location.href = '/registration';
+              }
+          } else {
+              alert(message);
+          }
+
+          history.replaceState(null, '', '/login');
+      </script>
+      {{/hasError}}
     <form class="form" action="/user/login" method="post">
       <div class="textfield textfield_size_s">
         <p class="title_textfield">아이디</p>
@@ -58,31 +75,5 @@
     </form>
   </div>
 </div>
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const params = new URLSearchParams(location.search);
-
-    const error = params.get('error');
-    const code = params.get('code');
-    const message = params.get('message');
-
-    if (error === 'true' && code === 'userNotFound' && message) {
-      const goRegister = confirm(decodeURIComponent(message));
-
-      if (goRegister) {
-        let url = '/registration';
-        window.location.href = url;
-      }
-    }
-
-    else if (error === 'true' && message) {
-      alert(decodeURIComponent(message));
-    }
-
-    if (error === 'true') {
-      history.replaceState({}, document.title, location.pathname);
-    }
-  });
-</script>
 </body>
 </html>

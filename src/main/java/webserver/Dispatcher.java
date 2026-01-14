@@ -2,10 +2,8 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.exception.BadRequestException;
-import webserver.exception.ConflictException;
-import webserver.exception.UnauthorizedException;
-import webserver.exception.WebException;
+import webserver.exception.httpexception.HTTPException;
+import webserver.exception.webexception.WebException;
 import webserver.http.HTTPMethod;
 import webserver.handler.Handler;
 import webserver.http.HTTPRequest;
@@ -45,7 +43,6 @@ public class Dispatcher {
 
             Handler handler = handlerMapping.getProperHandler(method, path);
 
-            // TODO: StaticHandler 다시 사용하는 방안으로 고민해보기. 현재 ViewResolver에서 Static File 처리 하는데 그러면 Static은 ModelAndView가 안생긴다.
             ModelAndView modelAndView = handler.handle(request);
 
             render(request.getVersion(), modelAndView, dos, writer);
@@ -53,6 +50,9 @@ public class Dispatcher {
         } catch (WebException e){
             logger.warn("Web Error Occurred: {} {}", e.getStatus(), e.getMessage());
             render(request.getVersion(), handleWebException(e), dos, writer);
+        } catch (HTTPException e){
+            logger.error("HTTP Error Occurred: {} {}", e.getStatus(), e.getMessage());
+            render(request.getVersion(), handleHTTPException(e), dos, writer);
         } catch (Exception e){
             // TODO: /error/500.html static file로 만들기
             logger.error("Internal System Error: ", e.getMessage());
@@ -61,29 +61,22 @@ public class Dispatcher {
     }
 
     public ModelAndView handleWebException(WebException e) {
-        String redirectPath = getRedirectPath(e);
-
-        if (redirectPath != null) {
-            return buildErrorRedirectMav(redirectPath, e);
-        }
-
-        // 리다이렉트가 아닌 경우
-        // TODO: /error/default html 생성
-        ModelAndView mav = new ModelAndView("/error/default");
-        mav.addObject("errorCode", e.getStatus().code());
-        mav.addObject("message", e.getMessage());
-        return mav;
+        String redirectPath = e.getRedirectPath();
+        return buildErrorRedirectMav(redirectPath, e);
     }
 
-    private String getRedirectPath(WebException e) {
-        if (e instanceof UnauthorizedException ||
-                e instanceof BadRequestException) {
-            return "/login/index.html";
-        }
-        if (e instanceof ConflictException) {
-            return "/registration/index.html";
-        }
-        return null;
+    private ModelAndView buildErrorRedirectMav(String path, WebException e) {
+        ModelAndView modelAndView = new ModelAndView(path);
+        e.fillModel(modelAndView.getModel());
+
+        return modelAndView;
+    }
+
+    public ModelAndView handleHTTPException(HTTPException e){
+        ModelAndView modelAndView = new ModelAndView("/error/default");
+        modelAndView.addObject("errorCode", e.getStatus().code());
+        modelAndView.addObject("message", e.getMessage());
+        return modelAndView;
     }
 
     private void render(String version,
@@ -97,19 +90,4 @@ public class Dispatcher {
             logger.error("Final Rendering Error: ", e);
         }
     }
-
-
-    private ModelAndView buildErrorRedirectMav(String path, WebException e) {
-        StringBuilder url = new StringBuilder(path);
-        url.append("?error=true&message=")
-                .append(URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8));
-
-        if (e.getCode() != null) {
-            url.append("&code=")
-                    .append(URLEncoder.encode(e.getCode(), StandardCharsets.UTF_8));
-        }
-
-        return new ModelAndView("redirect:" + url.toString());
-    }
-
 }

@@ -16,7 +16,7 @@ public class MainPageHandler extends DynamicHandler {
     // TODO: MainPage 내용 갈아끼우는거 구현하기. 특히 로그인 여부에 따라 file 자체가 달라지는 경우.
     @Override
     public ModelAndView handle(HTTPRequest request) {
-        ModelAndView modelAndView = new ModelAndView("template:" + request.getPath());
+        ModelAndView modelAndView = new ModelAndView(request.getPath());
 
         addTop(request.getSid(), modelAndView);
         return modelAndView;

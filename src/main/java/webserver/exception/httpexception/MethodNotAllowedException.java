@@ -1,9 +1,10 @@
-package webserver.exception;
+package webserver.exception.httpexception;
 
+import webserver.exception.webexception.WebException;
 import webserver.http.HTTPMethod;
 import webserver.http.HTTPStatus;
 
-public class MethodNotAllowedException extends WebException {
+public class MethodNotAllowedException extends HTTPException{
     public MethodNotAllowedException(String message) {
         super(HTTPStatus.METHOD_NOT_ALLOWED, message);
     }

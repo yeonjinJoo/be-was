@@ -1,7 +1,7 @@
 package webserver;
 
-import webserver.exception.MethodNotAllowedException;
-import webserver.exception.NotFoundException;
+import webserver.exception.httpexception.MethodNotAllowedException;
+import webserver.exception.httpexception.NotFoundException;
 import webserver.handler.StaticFileHandler;
 import webserver.http.HTTPMethod;
 import webserver.handler.Handler;

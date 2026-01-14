@@ -15,7 +15,7 @@ public class MyPageHandler extends DynamicHandler {
 
     @Override
     public ModelAndView handle(HTTPRequest request) {
-        ModelAndView modelAndView = new ModelAndView("template:"+ request.getPath());
+        ModelAndView modelAndView = new ModelAndView(request.getPath());
         User user = sessionManager.getUser(request.getSid());
         modelAndView.addObject("userName", user.getName());
         return modelAndView;

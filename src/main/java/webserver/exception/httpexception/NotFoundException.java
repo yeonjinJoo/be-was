@@ -1,8 +1,9 @@
-package webserver.exception;
+package webserver.exception.httpexception;
 
+import webserver.exception.webexception.WebException;
 import webserver.http.HTTPStatus;
 
-public class NotFoundException extends WebException {
+public class NotFoundException extends HTTPException {
     public NotFoundException(String message) {
         super(HTTPStatus.NOT_FOUND, message);
     }
