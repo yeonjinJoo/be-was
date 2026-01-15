@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/reset.css" rel="stylesheet" />
+    <link href="/global.css" rel="stylesheet" />
+    <link href="/main.css" rel="stylesheet" />
+    <title>Error</title>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <a href="/"><img src="/img/signiture.svg" /></a>
+    </header>
+
+    <div class="wrapper">
+        <div class="error-box">
+            <p class="error-status">
+                {{errorCode}}
+            </p>
+            <p class="error-message">
+                {{message}}
+            </p>
+
+            <a href="/" class="btn btn_contained btn_size_m error-btn">
+                홈으로 돌아가기
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

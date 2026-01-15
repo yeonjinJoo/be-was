@@ -8,19 +8,12 @@
   </head>
   <body>
     <div class="container">
-      <header class="header">
-        <a href="/"><img src="./img/signiture.svg" /></a>
-        <ul class="header__menu">
-        <li class="header__menu__item">
-            <a class="btn btn_contained btn_size_s" href="/article">글쓰기</a>
-          </li>
-          <li class="header__menu__item">
-            <button id="logout-btn" class="btn btn_ghost btn_size_s">
-              로그아웃
-            </button>
-          </li>
-        </ul>
-      </header>
+        <header class="header">
+            <a href="/"><img src="./img/signiture.svg" /></a>
+            <ul class="header__menu">
+                {{include:userStatus}}
+            </ul>
+        </header>
       <div class="page">
         <h2 class="page-title">마이페이지</h2>
 

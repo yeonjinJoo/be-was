@@ -20,7 +20,7 @@ public class ArticleService {
         try {
             // 파일 저장
             savedName = imageStorage.save(image);
-            String imageUrl = "/img/" + savedName;
+            String imageUrl = "/img/uploads/" + savedName;
 
             Article article = new Article(content, authorId, imageUrl);
 

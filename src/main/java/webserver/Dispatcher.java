@@ -72,7 +72,7 @@ public class Dispatcher {
     }
 
     public ModelAndView handleHTTPException(HTTPException e){
-        ModelAndView modelAndView = new ModelAndView("/error/default");
+        ModelAndView modelAndView = new ModelAndView("/error/index.html");
         modelAndView.addObject("errorCode", e.getStatus().code());
         modelAndView.addObject("message", e.getMessage());
         return modelAndView;

@@ -1,6 +1,7 @@
 package application.handler;
 
 import application.model.Article;
+import application.model.User;
 import application.service.ArticleService;
 import webserver.exception.webexception.BadRequestException;
 import webserver.handler.DynamicHandler;
@@ -24,14 +25,18 @@ public class ArticleCreateHandler extends DynamicHandler {
     @Override
     public ModelAndView handle(HTTPRequest request) {
         MultipartParser.applyTo(request);
+        User user = sessionManager.getUser(request.getSid());
 
-        int authorId = sessionManager.getUser(request.getSid()).getId();
-
+        int authorId = user.getId();
         String content = request.getBodyParams().getOrDefault("content", "");
         UploadedFile image = request.getFirstFile("image");
         if (image == null) throw BadRequestException.missingArticleImage();
 
         articleService.create(authorId, content, image);
-        return new ModelAndView("redirect:/");
+
+        ModelAndView modelAndView = new ModelAndView("redirect:/");
+        modelAndView.addObject("userName", user.getName());
+        modelAndView.addObject("userStatus", "nav_user.html");
+        return modelAndView;
     }
 }
