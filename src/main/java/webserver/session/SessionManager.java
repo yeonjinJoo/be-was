@@ -7,6 +7,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SessionManager {
+    // TODO: User 대신 id 저장으로 변경하기
     private static final Map<String, User> sessions = new ConcurrentHashMap<>();
 
     public String createSession(User user) {

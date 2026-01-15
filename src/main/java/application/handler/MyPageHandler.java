@@ -18,6 +18,7 @@ public class MyPageHandler extends DynamicHandler {
         ModelAndView modelAndView = new ModelAndView(request.getPath());
         User user = sessionManager.getUser(request.getSid());
         modelAndView.addObject("userName", user.getName());
+        modelAndView.addObject("profileImageUrl", user.getProfileImageUrl());
         return modelAndView;
     }
 }

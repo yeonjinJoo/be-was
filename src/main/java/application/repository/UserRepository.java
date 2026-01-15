@@ -16,5 +16,5 @@ public interface UserRepository {
 
     boolean existsByUserName(Connection conn, String userName);
 
-    void updateProfile(Connection conn, int id, String newName, String newPw);
+    void updateProfile(Connection conn, int id, String newName, String newPw, boolean changeProfileImage, String newImageUrl);
 }

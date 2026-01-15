@@ -1,10 +1,12 @@
 package application.service;
 
+import application.ImageStorage;
 import application.repository.JdbcTx;
 import application.repository.UserRepository;
 import application.model.User;
 import webserver.exception.webexception.BadRequestException;
 import webserver.exception.webexception.ConflictException;
+import webserver.multipart.UploadedFile;
 
 import java.util.Optional;
 
@@ -13,9 +15,11 @@ public class UserService {
     private static final String REGISTRATION_PAGE = "/registration";
     private static final String MY_PAGE = "/mypage";
     private final UserRepository userRepository;
+    private final ImageStorage imageStorage;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, ImageStorage imageStorage) {
         this.userRepository = userRepository;
+        this.imageStorage = imageStorage;
     }
 
     public void create(User user) {
@@ -46,12 +50,21 @@ public class UserService {
         });
     }
 
-    public Optional<User> changeProfile(int id, String newName, String newPassword, String confirmPassword) {
+    public Optional<User> changeProfile(int id,
+                                        String newName,
+                                        String newPassword,
+                                        String confirmPassword,
+                                        UploadedFile image,
+                                        boolean deleteProfile
+    ) {
         String newNm = normalize(newName);
         String newPw =  normalize(newPassword);
         String confirmPw = normalize(confirmPassword);
 
-        if (newNm == null && newPw == null && confirmPw == null) {
+        boolean hasTextChange = (newNm != null || newPw != null || confirmPw != null);
+        boolean hasImageChange = (image != null || deleteProfile);
+
+        if (!hasTextChange && !hasImageChange) {
             return Optional.empty();
         }
 
@@ -68,14 +81,50 @@ public class UserService {
             validateLength(MY_PAGE, newPw);
         }
 
-        return Optional.ofNullable(JdbcTx.executeInTx(conn -> {
-            if (newNm != null && userRepository.existsByUserName(conn, newNm)) {
-                throw ConflictException.duplicateUserName(MY_PAGE);
+        String savedFileName = null;
+        try{
+            if (image != null) {
+                savedFileName = imageStorage.save(image);
             }
 
-            userRepository.updateProfile(conn, id, newNm, newPw);
-            return userRepository.findById(conn, id);
-        }));
+            String finalSavedFileName = savedFileName;
+
+            User updated = JdbcTx.executeInTx(conn -> {
+                if (newNm != null && userRepository.existsByUserName(conn, newNm)) {
+                    throw ConflictException.duplicateUserName(MY_PAGE);
+                }
+
+                User user = userRepository.findById(conn, id);
+                String oldImageUrl = user.getProfileImageUrl();
+
+                String newImageUrl = oldImageUrl;
+
+                if (deleteProfile) {
+                    newImageUrl = null;
+                }
+                if (finalSavedFileName != null) {
+                    newImageUrl = "/img/uploads/" + finalSavedFileName;
+                }
+                System.out.println(newImageUrl);
+
+                userRepository.updateProfile(conn, id, newNm, newPw, hasImageChange, newImageUrl);
+
+                if ((deleteProfile || finalSavedFileName != null) && oldImageUrl != null) {
+                    imageStorage.deleteQuietly(extractFileName(oldImageUrl));
+                }
+
+                return userRepository.findById(conn, id);
+            });
+
+            return Optional.ofNullable(updated);
+
+        } catch (RuntimeException e) {
+            // DB 실패(또는 중간 실패) → 새로 저장한 파일만 롤백
+            if (savedFileName != null) {
+                imageStorage.deleteQuietly(savedFileName);
+            }
+            throw e;
+        }
     }
 
     private void validateLength(String redirectPath, String... values){
@@ -91,5 +140,12 @@ public class UserService {
         String t = s.trim();
         return t.isEmpty() ? null : t;
     }
+
+    private String extractFileName(String imageUrl) {
+        if (imageUrl == null) return null;
+        int idx = imageUrl.lastIndexOf('/');
+        return (idx >= 0) ? imageUrl.substring(idx + 1) : imageUrl;
+    }
+
 
 }

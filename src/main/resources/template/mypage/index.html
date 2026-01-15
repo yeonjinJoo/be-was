@@ -27,17 +27,23 @@
         <div class="profile_container">
           <div class="profile_box">
               <div class="profile_image">
-                <img class="profile" />
+                  <img
+                          class="profile"
+                          id="profile-preview"
+                          src="{{profileImageUrl}}"
+                          alt="profile"
+                  />
               </div>
               <div class="profile_frame">
-                  <div class="btn_profile">
+                  <div class="btn_profile" id="btn-edit">
                         <div class="btn_container">수정</div>
                   </div>
                   <div class="btn_bar"></div>
-                  <div class="btn_profile">
+                  <div class="btn_profile" id="btn-delete">
                       <div class="btn_container">삭제</div>
                   </div>
               </div>
+            </div>
         </div>
           {{#hasError}}
           <script>
@@ -45,7 +51,17 @@
             history.replaceState(null, '', '/mypage');
           </script>
           {{/hasError}}
-          <form class="form" action="/mypage" method="post">
+          <form class="form" action="/mypage" method="post" enctype="multipart/form-data">
+              <input
+                      id="profile-input"
+                      type="file"
+                      name="profileImage"
+                      accept="image/*"
+                      style="display: none"
+              />
+
+              <input type="hidden" id="profile-delete" name="profileDelete" value="false" />
+
             <div class="textfield textfield_size_s input_margin">
               <p class="title_textfield">닉네임</p>
               <input
@@ -82,9 +98,49 @@
             >
               변경사항 저장
             </button>
-
         </form>
       </div>
     </div>
+    <script>
+        const fileInput = document.getElementById("profile-input");
+        const img = document.getElementById("profile-preview");
+        const btnEdit = document.getElementById("btn-edit");
+        const btnDelete = document.getElementById("btn-delete");
+        const deleteFlag = document.getElementById("profile-delete");
+
+        const defaultSrc = "/img/basic_profileImage.svg";
+
+        if (!img.getAttribute("src")) {
+          img.src = defaultSrc;
+        }
+
+        const originalSrc = img.src;
+
+        // 1) 수정 클릭 -> 파일 선택창 열기
+        btnEdit.addEventListener("click", () => fileInput.click());
+
+        // 2) 파일 선택 -> 미리보기 + 삭제 플래그 해제
+        fileInput.addEventListener("change", () => {
+          if (!fileInput.files || fileInput.files.length === 0) return;
+
+          deleteFlag.value = "false";
+
+          const file = fileInput.files[0];
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            img.src = e.target.result; // 미리보기(서버 반영 X)
+          };
+          reader.readAsDataURL(file);
+        });
+
+        // 3) 삭제 클릭 -> 기본 이미지로 미리보기 + 삭제 플래그 true + 파일 선택 초기화
+        btnDelete.addEventListener("click", () => {
+          fileInput.value = "";
+          deleteFlag.value = "true";
+          img.src = defaultSrc;
+        });
+
+        // (선택) 사용자가 파일선택 열었다가 취소하면 아무 변화 없음 -> 현재 코드가 이미 그렇게 동작함
+    </script>
   </body>
 </html>

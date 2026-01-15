@@ -6,6 +6,7 @@ public class User {
     private String password;
     private String name;
     private String email;
+    private String profileImageUrl;
 
     public User(String userId, String password, String name, String email) {
         this.id = null;
@@ -13,14 +14,16 @@ public class User {
         this.password = password;
         this.name = name;
         this.email = email;
+        this.profileImageUrl = null;
     }
 
-    public User(Integer id, String userId, String password, String name, String email) {
+    public User(Integer id, String userId, String password, String name, String email, String profileImageUrl) {
         this.id = id;
         this.userId = userId;
         this.password = password;
         this.name = name;
         this.email = email;
+        this.profileImageUrl = profileImageUrl;
     }
 
     public Integer getId() {
@@ -41,5 +44,9 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getProfileImageUrl(){
+        return profileImageUrl;
     }
 }

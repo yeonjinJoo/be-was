@@ -18,7 +18,8 @@ public class TemplateEngine {
             String key = matcher.group(1).trim();
             // model에서 값을 찾고, 없으면 빈 문자열로 대체
             Object value = model.getOrDefault(key, "");
-            matcher.appendReplacement(sb, Matcher.quoteReplacement(value.toString()));
+            String str = (value == null) ? "" : value.toString();
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(str));
         }
         matcher.appendTail(sb);
         return sb.toString();

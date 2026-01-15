@@ -4,6 +4,8 @@ import application.model.User;
 import application.service.UserService;
 import webserver.handler.DynamicHandler;
 import webserver.http.HTTPRequest;
+import webserver.multipart.MultipartParser;
+import webserver.multipart.UploadedFile;
 import webserver.session.SessionManager;
 import webserver.view.ModelAndView;
 import java.util.Map;
@@ -21,19 +23,37 @@ public class MyPageChangeHandler extends DynamicHandler {
 
     @Override
     public ModelAndView handle(HTTPRequest request) {
+        MultipartParser.applyTo(request);
         Map<String, String> bodyParams = request.getBodyParams();
 
         String userName = bodyParams.get("userName");
         String newPassword = bodyParams.get("newPassword");
         String confirmNewPassword = bodyParams.get("confirmNewPassword");
+        UploadedFile profileImage = request.getFirstFile("profileImage");
+        boolean deleteProfile =
+                "true".equals(bodyParams.getOrDefault("profileDelete", "false"));
 
         User user = sessionManager.getUser(request.getSid());
 
-        if (userName == null && newPassword == null && confirmNewPassword == null) {
+        if (userName == null
+                && newPassword == null
+                && confirmNewPassword == null
+                && profileImage == null
+                && !deleteProfile
+        ) {
             return new ModelAndView(MY_PAGE);
         }
 
-        Optional<User> newInfoUser = userService.changeProfile(user.getId(), userName, newPassword, confirmNewPassword);
+        Optional<User> newInfoUser =
+                userService.changeProfile(
+                        user.getId(),
+                        userName,
+                        newPassword,
+                        confirmNewPassword,
+                        profileImage,
+                        deleteProfile
+                );
+
         if (newInfoUser.isPresent()) {
            sessionManager.setUser(request.getSid(), newInfoUser.get());
         }

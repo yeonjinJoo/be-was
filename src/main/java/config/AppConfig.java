@@ -20,7 +20,7 @@ public class AppConfig {
 
     private final ImageStorage imageStorage = new ImageStorage("./src/main/resources/static/img/uploads");
 
-    private final UserService userService = new UserService(userRepository);
+    private final UserService userService = new UserService(userRepository, imageStorage);
     private final ArticleService articleService = new ArticleService(articleRepository, imageStorage);
 
     private final SessionManager sessionManager = new SessionManager();

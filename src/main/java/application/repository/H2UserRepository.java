@@ -3,10 +3,7 @@ package application.repository;
 import application.model.User;
 import config.DBConfig;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Optional;
 
 public class H2UserRepository implements UserRepository {
@@ -31,7 +28,7 @@ public class H2UserRepository implements UserRepository {
 
     @Override
     public Optional<User> findByUserId(Connection conn, String userId) {
-        String sql = "SELECT id, user_id, password, name, email FROM users WHERE user_id = ?";
+        String sql = "SELECT id, user_id, password, name, email, profile_image_url FROM users WHERE user_id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, userId);
 
@@ -43,7 +40,8 @@ public class H2UserRepository implements UserRepository {
                         rs.getString("user_id"),
                         rs.getString("password"),
                         rs.getString("name"),
-                        rs.getString("email")
+                        rs.getString("email"),
+                        rs.getString("profile_image_url")
                 );
                 return Optional.of(user);
             }
@@ -54,7 +52,7 @@ public class H2UserRepository implements UserRepository {
 
     @Override
     public User findById(Connection conn, int id) {
-        String sql = "SELECT id, user_id, password, name, email FROM users WHERE id = ?";
+        String sql = "SELECT id, user_id, password, name, email, profile_image_url FROM users WHERE id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
 
@@ -65,7 +63,8 @@ public class H2UserRepository implements UserRepository {
                         rs.getString("user_id"),
                         rs.getString("password"),
                         rs.getString("name"),
-                        rs.getString("email")
+                        rs.getString("email"),
+                        rs.getString("profile_image_url")
                 );
                 return user;
             }
@@ -100,7 +99,7 @@ public class H2UserRepository implements UserRepository {
         }
     }
 
-    public void updateProfile(Connection conn, int id, String newName, String newPw) {
+    public void updateProfile(Connection conn, int id, String newName, String newPw, boolean changeProfileImage, String newProfileUrl) {
         StringBuilder sql = new StringBuilder("UPDATE users SET ");
         boolean first = true;
 
@@ -111,6 +110,12 @@ public class H2UserRepository implements UserRepository {
         if (newPw != null) {
             if (!first) sql.append(", ");
             sql.append("password = ?");
+            first = false;
+        }
+        if(changeProfileImage){
+            if (!first) sql.append(", ");
+            sql.append("profile_image_url = ?");
+            first = false;
         }
         sql.append(" WHERE id = ?");
 
@@ -118,6 +123,14 @@ public class H2UserRepository implements UserRepository {
             int idx = 1;
             if (newName != null) ps.setString(idx++, newName);
             if (newPw != null) ps.setString(idx++, newPw);
+            if(changeProfileImage){
+                if(newProfileUrl == null){
+                    ps.setNull(idx++, Types.VARCHAR);
+                }
+                else{
+                    ps.setString(idx++, newProfileUrl);
+                }
+            }
             ps.setInt(idx, id);
 
             int affected = ps.executeUpdate();
