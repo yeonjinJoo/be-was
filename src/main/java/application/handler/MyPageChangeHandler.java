@@ -1,20 +1,20 @@
 package application.handler;
 
+import application.model.User;
 import application.service.UserService;
-import webserver.exception.webexception.BadRequestException;
-import webserver.exception.webexception.ConflictException;
 import webserver.handler.DynamicHandler;
 import webserver.http.HTTPRequest;
 import webserver.session.SessionManager;
 import webserver.view.ModelAndView;
 import java.util.Map;
+import java.util.Optional;
 
-public class UserChangeInfoHandler extends DynamicHandler {
+public class MyPageChangeHandler extends DynamicHandler {
     private static final String MY_PAGE = "/mypage";
     private final UserService userService;
     private final SessionManager sessionManager;
 
-    public UserChangeInfoHandler(UserService userService, SessionManager sessionManager) {
+    public MyPageChangeHandler(UserService userService,  SessionManager sessionManager) {
         this.userService = userService;
         this.sessionManager = sessionManager;
     }
@@ -24,33 +24,21 @@ public class UserChangeInfoHandler extends DynamicHandler {
         Map<String, String> bodyParams = request.getBodyParams();
 
         String userName = bodyParams.get("userName");
-        checkUserName(userName);
-
-        String newPassword = bodyParams.get("password");
+        String newPassword = bodyParams.get("newPassword");
         String confirmNewPassword = bodyParams.get("confirmNewPassword");
-        checkPassword(newPassword, confirmNewPassword);
 
-    }
+        User user = sessionManager.getUser(request.getSid());
 
-    private void checkUserName(String userName) {
-        if(userName != null){
-            if(userService.isDuplicateName(userName)){
-                throw ConflictException.duplicateUserName(MY_PAGE);
-            }
-
-            if(!userService.isValidLength(userName)){
-                throw BadRequestException.invalidParameters(MY_PAGE);
-            }
-        }
-    }
-
-    private void checkPassword(String newPassword, String confirmNewPassword) {
-        if(newPassword == null || confirmNewPassword == null){
-            return;
+        if (userName == null && newPassword == null && confirmNewPassword == null) {
+            return new ModelAndView(MY_PAGE);
         }
 
+        Optional<User> newInfoUser = userService.changeProfile(user.getId(), userName, newPassword, confirmNewPassword);
+        if (newInfoUser.isPresent()) {
+           sessionManager.setUser(request.getSid(), newInfoUser.get());
+        }
 
+        return new ModelAndView("redirect:/index.html");
     }
-
-//    public void
 }
+

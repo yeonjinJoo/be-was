@@ -10,6 +10,7 @@ import webserver.view.ModelAndView;
 import java.util.Map;
 
 public class UserCreateHandler extends DynamicHandler {
+    private static final String REGISTRATION_URL = "/registration/index.html";
     private final UserService userService;
 
     public UserCreateHandler(UserService userService) {
@@ -26,29 +27,24 @@ public class UserCreateHandler extends DynamicHandler {
 
     private User createUser(HTTPRequest request) {
         Map<String, String> bodyParams = request.getBodyParams();
-        if(!isValidCreateParams(bodyParams)) {
-            throw BadRequestException.invalidParameters("/registration/index.html");
-        }
+        validatePresence(bodyParams);
 
         User user = new User(bodyParams.get("userId"),
                 bodyParams.get("password"),
                 bodyParams.get("name"),
                 bodyParams.get("email"));
+
+        userService.create(user);
         return user;
     }
 
-    private boolean isValidCreateParams(Map<String, String> qp) {
-        if (qp == null || qp.isEmpty()) return false;
-
-        boolean isExist = isPresent(qp, "userId")
-                        && isPresent(qp, "password")
-                        && isPresent(qp, "name")
-                        && isPresent(qp, "email");
-
-        if(isExist) {
-            return userService.isValidLength(qp.get("userId"), qp.get("password"), qp.get("name"), qp.get("email"));
+    private void validatePresence(Map<String, String> qp) {
+        if (!isPresent(qp, "userId")
+                || !isPresent(qp, "password")
+                || !isPresent(qp, "name")
+                || !isPresent(qp, "email")) {
+            throw BadRequestException.missingParameters();
         }
-        return false;
     }
 
     private boolean isPresent(Map<String, String> qp, String key) {

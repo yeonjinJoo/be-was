@@ -1,10 +1,7 @@
 package config;
 
 import application.handler.*;
-import application.repository.H2PostRepository;
-import application.repository.H2UserRepository;
-import application.repository.PostRepository;
-import application.repository.UserRepository;
+import application.repository.*;
 import application.service.PostService;
 import application.service.UserService;
 import webserver.HandlerMapping;
@@ -33,6 +30,7 @@ public class AppConfig {
     private final PostCreateHandler postCreateHandler = new PostCreateHandler(postService, sessionManager);
     private final MainPageHandler mainPageHandler = new MainPageHandler(sessionManager);
     private final MyPageHandler myPageHandler = new MyPageHandler(sessionManager);
+    private final MyPageChangeHandler myPageChangeHandler = new MyPageChangeHandler(userService, sessionManager);
 
     private final LoginCheckInterceptor loginCheckInterceptor = new LoginCheckInterceptor(sessionManager);
 
@@ -72,6 +70,7 @@ public class AppConfig {
         handlerMapping.register(HTTPMethod.POST, "/user/logout", userLogoutHandler);
         handlerMapping.register(HTTPMethod.POST, "/article/create", postCreateHandler);
         handlerMapping.register(HTTPMethod.GET, "/mypage", myPageHandler);
+        handlerMapping.register(HTTPMethod.POST, "/mypage", myPageChangeHandler);
         handlerMapping.register(HTTPMethod.GET, "/", mainPageHandler);
         handlerMapping.register(HTTPMethod.GET, "/index.html", mainPageHandler);
     }

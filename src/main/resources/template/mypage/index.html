@@ -39,7 +39,13 @@
                   </div>
               </div>
         </div>
-          <form class="form" action="/user/change" method="post">
+          {{#hasError}}
+          <script>
+            alert(decodeURIComponent("{{errorMessage}}"));
+            history.replaceState(null, '', '/mypage');
+          </script>
+          {{/hasError}}
+          <form class="form" action="/mypage" method="post">
             <div class="textfield textfield_size_s input_margin">
               <p class="title_textfield">닉네임</p>
               <input
@@ -53,6 +59,7 @@
               <p class="title_textfield">비밀번호</p>
               <input
                 class="input_textfield"
+                type="password"
                 placeholder="비밀번호를 변경할 경우 입력해주세요"
                 autocomplete="current-password"
                 name="newPassword"

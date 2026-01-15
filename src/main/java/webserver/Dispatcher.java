@@ -56,6 +56,7 @@ public class Dispatcher {
         } catch (Exception e){
             // TODO: /error/500.html static file로 만들기
             logger.error("Internal System Error: ", e.getMessage());
+            e.printStackTrace();
             render(request.getVersion(), new ModelAndView("redirect:/error/500.html"), dos, writer);
         }
     }

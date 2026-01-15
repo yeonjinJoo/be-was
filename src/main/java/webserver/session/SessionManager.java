@@ -25,4 +25,9 @@ public class SessionManager {
         sessions.remove(sid);
     }
 
+    public void setUser(String sid, User user) {
+        if (sid == null) return;
+        sessions.put(sid, user);
+    }
+
 }

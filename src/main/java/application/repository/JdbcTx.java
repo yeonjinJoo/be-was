@@ -1,11 +1,12 @@
 package application.repository;
 
 import config.DBConfig;
+import webserver.exception.webexception.WebException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public final class JdbcTx {
+public class JdbcTx {
 
     @FunctionalInterface
     public interface Work<T> {
@@ -13,7 +14,7 @@ public final class JdbcTx {
     }
 
     // read / 단일 update 용
-    public <T> T execute(Work<T> work) {
+    public static <T> T execute(Work<T> work) {
         try (Connection conn = DBConfig.getConnection()) {
             return work.run(conn);
         } catch (Exception e) {
@@ -22,7 +23,7 @@ public final class JdbcTx {
     }
 
     // transaction 필요한 경우
-    public <T> T executeInTx(Work<T> work) {
+    public static <T> T executeInTx(Work<T> work) {
         try (Connection conn = DBConfig.getConnection()) {
             boolean oldAutoCommit = conn.getAutoCommit();
             conn.setAutoCommit(false);
@@ -41,7 +42,7 @@ public final class JdbcTx {
         }
     }
 
-    private RuntimeException rethrow(Exception e) {
-        return (e instanceof RuntimeException re) ? re : new RuntimeException(e);
+    private static RuntimeException rethrow(Exception e) {
+        return (e instanceof WebException we) ? we : new RuntimeException(e);
     }
 }

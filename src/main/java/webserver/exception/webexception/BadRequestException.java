@@ -3,7 +3,8 @@ package webserver.exception.webexception;
 import webserver.http.HTTPStatus;
 
 public class BadRequestException extends WebException {
-    private static final String LOGIN_PAGE = "/login/index.html";
+    private static final String LOGIN_PAGE = "/login";
+    private static final String MY_PAGE = "/mypage";
 
     public BadRequestException(String message, String redirectPath) {
         super(HTTPStatus.BAD_REQUEST, message, redirectPath);
@@ -25,5 +26,13 @@ public class BadRequestException extends WebException {
 
     public static BadRequestException missingParameters() {
         return new BadRequestException("요청 데이터가 충분하지 않습니다.", LOGIN_PAGE);
+    }
+
+    public static BadRequestException missingChangePassword(){
+        return new BadRequestException("새로운 비밀번호와 비밀번호 확인 모두 입력해 주세요.", MY_PAGE);
+    }
+
+    public static BadRequestException invalidChangePassword(){
+        return new BadRequestException("새로운 비밀번호와 비밀번호 확인이 일치하지 않습니다.", MY_PAGE);
     }
 }
