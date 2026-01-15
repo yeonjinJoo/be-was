@@ -3,7 +3,7 @@ package webserver.exception.webexception;
 import webserver.http.HTTPStatus;
 
 public class UnauthorizedException extends WebException {
-    private static final String LOGIN_PAGE = "/login/index.html";
+    private static final String LOGIN_PAGE = "/login";
 
     public UnauthorizedException(String message, String redirectPath) {
         super(HTTPStatus.UNAUTHORIZED, message, redirectPath);

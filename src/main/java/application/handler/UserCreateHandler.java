@@ -10,7 +10,7 @@ import webserver.view.ModelAndView;
 import java.util.Map;
 
 public class UserCreateHandler extends DynamicHandler {
-    private static final String REGISTRATION_URL = "/registration/index.html";
+    private static final String REGISTRATION_URL = "/registrationl";
     private final UserService userService;
 
     public UserCreateHandler(UserService userService) {

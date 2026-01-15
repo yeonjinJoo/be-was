@@ -5,6 +5,7 @@ import webserver.http.HTTPStatus;
 public class BadRequestException extends WebException {
     private static final String LOGIN_PAGE = "/login";
     private static final String MY_PAGE = "/mypage";
+    private static final String ARTICLE_PAGE = "/article";
 
     public BadRequestException(String message, String redirectPath) {
         super(HTTPStatus.BAD_REQUEST, message, redirectPath);
@@ -34,5 +35,37 @@ public class BadRequestException extends WebException {
 
     public static BadRequestException invalidChangePassword(){
         return new BadRequestException("새로운 비밀번호와 비밀번호 확인이 일치하지 않습니다.", MY_PAGE);
+    }
+
+    public static BadRequestException missingArticleImage(){
+        return new BadRequestException("파일 첨부가 필요합니다.", ARTICLE_PAGE);
+    }
+
+    public static BadRequestException invalidImageType() {
+        return new BadRequestException(
+                "이미지 파일만 업로드할 수 있습니다.",
+                ARTICLE_PAGE
+        );
+    }
+
+    public static BadRequestException invalidImageExtension() {
+        return new BadRequestException(
+                "허용되지 않은 이미지 확장자입니다.",
+                ARTICLE_PAGE
+        );
+    }
+
+    public static BadRequestException emptyImageFile() {
+        return new BadRequestException(
+                "업로드된 파일이 비어 있습니다.",
+                ARTICLE_PAGE
+        );
+    }
+
+    public static BadRequestException imageSizeExceeded(int maxMB) {
+        return new BadRequestException(
+                "이미지 크기는 " + maxMB + "MB 이하만 가능합니다.",
+                ARTICLE_PAGE
+        );
     }
 }

@@ -5,6 +5,8 @@ import application.service.ArticleService;
 import webserver.exception.webexception.BadRequestException;
 import webserver.handler.DynamicHandler;
 import webserver.http.HTTPRequest;
+import webserver.multipart.MultipartParser;
+import webserver.multipart.UploadedFile;
 import webserver.session.SessionManager;
 import webserver.view.ModelAndView;
 
@@ -21,32 +23,15 @@ public class ArticleCreateHandler extends DynamicHandler {
 
     @Override
     public ModelAndView handle(HTTPRequest request) {
-        String sid = request.getSid();
-        int authorId = sessionManager.getUser(sid).getId();
+        MultipartParser.applyTo(request);
 
-        Article article = createArticle(request, authorId);
-        articleService.create(article);
-        return new ModelAndView("redirect:/index.html");
-    }
+        int authorId = sessionManager.getUser(request.getSid()).getId();
 
-    private Article createArticle(HTTPRequest request, int authorId) {
-        Map<String, String> bodyParams = request.getBodyParams();
-        if(!isValidCreateParams(bodyParams)) {
-            throw BadRequestException.missingParameters();
-        }
+        String content = request.getBodyParams().getOrDefault("content", "");
+        UploadedFile image = request.getFirstFile("image");
+        if (image == null) throw BadRequestException.missingArticleImage();
 
-        Article article = new Article(bodyParams.get("content"), authorId);
-        return article;
-    }
-
-    private boolean isValidCreateParams(Map<String, String> qp) {
-        if (qp == null || qp.isEmpty()) return false;
-
-        return isPresent(qp, "content");
-    }
-
-    private boolean isPresent(Map<String, String> qp, String key) {
-        String v = qp.get(key);
-        return v != null && !v.isBlank();
+        articleService.create(authorId, content, image);
+        return new ModelAndView("redirect:/");
     }
 }

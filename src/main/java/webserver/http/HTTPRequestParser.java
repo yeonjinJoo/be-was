@@ -7,14 +7,17 @@ import webserver.WebServer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 public class HTTPRequestParser {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
-    public HTTPRequest parse(BufferedReader br) throws IOException {
+    public HTTPRequest parse(InputStream in) throws IOException {
         // 1. requestLine 읽기
-        String requestLine = br.readLine();
+        String requestLine = readLine(in);
         if (requestLine == null) return null;
+        if (requestLine.isEmpty()) return null;
 
         String[] tokens = parseRequestLine(requestLine);
         HTTPMethod method = HTTPMethod.valueOf(tokens[0]);
@@ -27,16 +30,46 @@ public class HTTPRequestParser {
 
         // 3. 헤더 파싱
         StringBuilder rawHeaders = new StringBuilder().append(requestLine).append("\r\n");
-        HashMap<String, String> headers = parseHeaders(br, rawHeaders);
+        HashMap<String, String> headers = parseHeaders(in, rawHeaders);
 
         // 4. sid 파싱
         String cookieValue = headers.get("cookie");
         String sid = cookieValue == null ? null : CookieUtils.getCookieValue(cookieValue, "sid");
 
         // 5. 바디 파싱
-        HashMap<String, String> bodyParams = parseBody(br, headers);
+        HashMap<String, String> bodyParams = new HashMap<>();
+        byte[] rawBody = new byte[0];
 
-        return new HTTPRequest(method, path, queryParams, headers, bodyParams, rawHeaders.toString(), version, sid);
+        String cl = headers.get("content-length");
+        if (cl != null) {
+            int contentLength = Integer.parseInt(cl);
+            if (contentLength > 0) {
+                rawBody = readBytes(in, contentLength);
+
+                String contentType = headers.getOrDefault("content-type", "");
+                if (contentType.startsWith("application/x-www-form-urlencoded")) {
+                    String bodyStr = new String(rawBody, StandardCharsets.UTF_8);
+                    bodyParams = parseQueryString(bodyStr);
+                } else if (contentType.startsWith("multipart/form-data")) {
+                    // multipart 텍스트/파일 파싱은 분리된 MultipartParser에서.
+                } else {
+                    throw new IllegalArgumentException("처리할 수 없는 body입니다.");
+                }
+            }
+        }
+
+        return new HTTPRequest(
+                method,
+                path,
+                queryParams,
+                headers,
+                bodyParams,
+                rawBody,
+                new HashMap<>(),
+                rawHeaders.toString(),
+                version,
+                sid
+        );
     }
 
     private String[] parseRequestLine(String requestLine) {
@@ -59,14 +92,14 @@ public class HTTPRequestParser {
         return parseQueryString(requestTarget.substring(qMarkIndex + 1));
     }
 
-    private HashMap<String, String> parseHeaders(BufferedReader br, StringBuilder rawHeaders) throws IOException {
+    private HashMap<String, String> parseHeaders(InputStream in, StringBuilder rawHeaders) throws IOException {
         HashMap<String, String> headers = new HashMap<>();
         String line;
 
         // HTTP/1.1 HTTP 요청을 한 번 보내고 connection이 종료되지 않고 유지된다.
         // 한 번의 HTTP 요청 헤더는 빈 줄로 종료되며, 연결이 유지되는 경우 readLine()은 null을 반환하지 않기 때문에
         // 빈 줄을 기준으로 헤더 읽기를 종료해야 한다.
-        while ((line = br.readLine()) != null && !line.isEmpty()) {
+        while ((line = readLine(in)) != null && !line.isEmpty()) {
             rawHeaders.append(line).append("\r\n");
             int colonIndex = line.indexOf(":");
             if (colonIndex > 0) {
@@ -78,31 +111,33 @@ public class HTTPRequestParser {
         return headers;
     }
 
-    private HashMap<String, String> parseBody(BufferedReader br, HashMap<String, String> headers) throws IOException {
-        HashMap<String, String> bodyParams = new HashMap<>();
-        if(!headers.containsKey("content-length") || !headers.containsKey("content-type")) {
-            return bodyParams;
+    private String readLine(InputStream in) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int prev = -1;
+        int cur;
+
+        while ((cur = in.read()) != -1) {
+            if (prev == '\r' && cur == '\n') {
+                sb.setLength(sb.length() - 1); // remove '\r'
+                break;
+            }
+            sb.append((char) cur);
+            prev = cur;
         }
 
-        // 현재 application/x-www-form-urlencoded 타입만 지원
-        String contentType = headers.get("content-type");
-        if(!contentType.equals("application/x-www-form-urlencoded")) {
-            // throw 에러
-            throw new IllegalArgumentException("처리할 수 없는 body입니다.");
+        if (cur == -1 && sb.length() == 0) return null;
+        return sb.toString();
+    }
+
+    private byte[] readBytes(InputStream in, int len) throws IOException {
+        byte[] buf = new byte[len];
+        int off = 0;
+        while (off < len) {
+            int r = in.read(buf, off, len - off);
+            if (r == -1) throw new IOException("Unexpected EOF while reading body");
+            off += r;
         }
-
-
-        int contentLength = Integer.parseInt(headers.get("content-length"));
-        char[] buffer = new char[contentLength];
-        int bytesRead = 0;
-        while (bytesRead < contentLength) {
-            int read = br.read(buffer, bytesRead, contentLength - bytesRead);
-            if (read == -1) break; // 스트림 끝 도달
-            bytesRead += read;
-        }
-
-        String bodyData = new String(buffer);
-        return parseQueryString(bodyData);
+        return buf;
     }
 
     private HashMap<String, String> parseQueryString(String queryString) {

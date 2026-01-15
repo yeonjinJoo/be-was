@@ -20,12 +20,13 @@ public class DBConfig {
         """;
 
         String createArticle = """
-        CREATE TABLE IF NOT EXISTS POST (
-            post_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+        CREATE TABLE IF NOT EXISTS ARTICLE (
+            article_id BIGINT AUTO_INCREMENT PRIMARY KEY,
             content TEXT NOT NULL,
             author_id BIGINT NOT NULL,
+            image_url VARCHAR(255) NOT NULL,
             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            CONSTRAINT fk_post_user
+            CONSTRAINT fk_article_user
                 FOREIGN KEY (author_id)
                 REFERENCES USERS(id)
         )

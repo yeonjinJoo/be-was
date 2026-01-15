@@ -38,7 +38,7 @@ public class MyPageChangeHandler extends DynamicHandler {
            sessionManager.setUser(request.getSid(), newInfoUser.get());
         }
 
-        return new ModelAndView("redirect:/index.html");
+        return new ModelAndView("redirect:/");
     }
 }
 

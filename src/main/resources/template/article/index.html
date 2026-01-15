@@ -71,5 +71,11 @@
       });
     </script>
 
+    {{#hasError}}
+    <script>
+        alert(decodeURIComponent("{{errorMessage}}"));
+        history.replaceState(null, '', '/article');
+    </script>
+    {{/hasError}}
   </body>
 </html>

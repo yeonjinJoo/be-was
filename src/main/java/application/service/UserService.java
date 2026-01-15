@@ -9,8 +9,8 @@ import webserver.exception.webexception.ConflictException;
 import java.util.Optional;
 
 public class UserService {
-    private static final String LOGIN_PAGE = "/login/index.html";
-    private static final String REGISTRATION_PAGE = "/registration/index.html";
+    private static final String LOGIN_PAGE = "/login";
+    private static final String REGISTRATION_PAGE = "/registration";
     private static final String MY_PAGE = "/mypage";
     private final UserRepository userRepository;
 

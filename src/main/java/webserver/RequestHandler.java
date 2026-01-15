@@ -49,13 +49,12 @@ public class RequestHandler implements Runnable {
 
     private void handleConnection(InputStream in, OutputStream out) throws IOException{
         DataOutputStream dos = new DataOutputStream(out);
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
         int requestCount = 0;
 
         while(true){
             try {
-                HTTPRequest httpRequest = httpRequestParser.parse(br);
+                HTTPRequest httpRequest = httpRequestParser.parse(in);
                 if(httpRequest == null){
                     logger.debug("Client closed TCP connection. Handled {} requests on this connection.", requestCount);
                     break;

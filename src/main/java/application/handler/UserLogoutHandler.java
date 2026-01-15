@@ -19,7 +19,7 @@ public class UserLogoutHandler extends DynamicHandler {
         String sid = request.getSid();
 
         sessionManager.invalidate(sid);
-        ModelAndView modelAndView = new ModelAndView("redirect:/index.html");
+        ModelAndView modelAndView = new ModelAndView("redirect:/");
         modelAndView.addHeader("Set-Cookie", CookieUtils.buildExpireSidCookie(sid));
         return modelAndView;
     }

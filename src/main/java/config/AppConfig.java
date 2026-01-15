@@ -1,5 +1,6 @@
 package config;
 
+import application.ImageStorage;
 import application.handler.*;
 import application.repository.*;
 import application.service.ArticleService;
@@ -17,8 +18,10 @@ public class AppConfig {
     private final UserRepository userRepository = new H2UserRepository();
     private final ArticleRepository articleRepository = new H2ArticleRepository();
 
+    private final ImageStorage imageStorage = new ImageStorage("./src/main/resources/static/img/uploads");
+
     private final UserService userService = new UserService(userRepository);
-    private final ArticleService articleService = new ArticleService(articleRepository);
+    private final ArticleService articleService = new ArticleService(articleRepository, imageStorage);
 
     private final SessionManager sessionManager = new SessionManager();
 
@@ -72,6 +75,6 @@ public class AppConfig {
         handlerMapping.register(HTTPMethod.GET, "/mypage", myPageHandler);
         handlerMapping.register(HTTPMethod.POST, "/mypage", myPageChangeHandler);
         handlerMapping.register(HTTPMethod.GET, "/", mainPageHandler);
-        handlerMapping.register(HTTPMethod.GET, "/index.html", mainPageHandler);
+        handlerMapping.register(HTTPMethod.POST, "/article/create", articleCreateHandler);
     }
 }
