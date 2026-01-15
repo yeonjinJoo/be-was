@@ -2,7 +2,7 @@ package config;
 
 import application.handler.*;
 import application.repository.*;
-import application.service.PostService;
+import application.service.ArticleService;
 import application.service.UserService;
 import webserver.HandlerMapping;
 import webserver.Dispatcher;
@@ -15,10 +15,10 @@ import webserver.interceptor.LoginCheckInterceptor;
 public class AppConfig {
 
     private final UserRepository userRepository = new H2UserRepository();
-    private final PostRepository postRepository = new H2PostRepository();
+    private final ArticleRepository articleRepository = new H2ArticleRepository();
 
     private final UserService userService = new UserService(userRepository);
-    private final PostService postService = new PostService(postRepository);
+    private final ArticleService articleService = new ArticleService(articleRepository);
 
     private final SessionManager sessionManager = new SessionManager();
 
@@ -27,7 +27,7 @@ public class AppConfig {
     private final UserCreateHandler userCreateHandler = new UserCreateHandler(userService);
     private final UserLoginHandler userLoginHandler = new UserLoginHandler(userService, sessionManager);
     private final UserLogoutHandler userLogoutHandler = new UserLogoutHandler(sessionManager);
-    private final PostCreateHandler postCreateHandler = new PostCreateHandler(postService, sessionManager);
+    private final ArticleCreateHandler articleCreateHandler = new ArticleCreateHandler(articleService, sessionManager);
     private final MainPageHandler mainPageHandler = new MainPageHandler(sessionManager);
     private final MyPageHandler myPageHandler = new MyPageHandler(sessionManager);
     private final MyPageChangeHandler myPageChangeHandler = new MyPageChangeHandler(userService, sessionManager);
@@ -68,7 +68,7 @@ public class AppConfig {
         handlerMapping.register(HTTPMethod.POST, "/user/create", userCreateHandler);
         handlerMapping.register(HTTPMethod.POST, "/user/login", userLoginHandler);
         handlerMapping.register(HTTPMethod.POST, "/user/logout", userLogoutHandler);
-        handlerMapping.register(HTTPMethod.POST, "/article/create", postCreateHandler);
+        handlerMapping.register(HTTPMethod.POST, "/article/create", articleCreateHandler);
         handlerMapping.register(HTTPMethod.GET, "/mypage", myPageHandler);
         handlerMapping.register(HTTPMethod.POST, "/mypage", myPageChangeHandler);
         handlerMapping.register(HTTPMethod.GET, "/", mainPageHandler);

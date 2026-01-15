@@ -60,5 +60,16 @@
         </form>
       </div>
     </div>
+    <script>
+      const input = document.getElementById("file-input");
+      const fileName = document.getElementById("file-name");
+
+      input.addEventListener("change", () => {
+        fileName.textContent = input.files?.length
+          ? input.files[0].name
+          : "첨부파일 없음";
+      });
+    </script>
+
   </body>
 </html>

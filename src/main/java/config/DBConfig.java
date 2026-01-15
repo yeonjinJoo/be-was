@@ -19,7 +19,7 @@ public class DBConfig {
         )
         """;
 
-        String createPost = """
+        String createArticle = """
         CREATE TABLE IF NOT EXISTS POST (
             post_id BIGINT AUTO_INCREMENT PRIMARY KEY,
             content TEXT NOT NULL,
@@ -35,7 +35,7 @@ public class DBConfig {
              Statement stmt = conn.createStatement()) {
 
             stmt.execute(createUsers);
-            stmt.execute(createPost);
+            stmt.execute(createArticle);
 
         } catch (SQLException e) {
             e.printStackTrace();

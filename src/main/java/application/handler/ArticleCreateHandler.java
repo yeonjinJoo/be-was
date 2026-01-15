@@ -1,7 +1,7 @@
 package application.handler;
 
-import application.model.Post;
-import application.service.PostService;
+import application.model.Article;
+import application.service.ArticleService;
 import webserver.exception.webexception.BadRequestException;
 import webserver.handler.DynamicHandler;
 import webserver.http.HTTPRequest;
@@ -10,12 +10,12 @@ import webserver.view.ModelAndView;
 
 import java.util.Map;
 
-public class PostCreateHandler extends DynamicHandler {
-    private final PostService postService;
+public class ArticleCreateHandler extends DynamicHandler {
+    private final ArticleService articleService;
     private final SessionManager sessionManager;
 
-    public PostCreateHandler(PostService postService, SessionManager sessionManager) {
-        this.postService = postService;
+    public ArticleCreateHandler(ArticleService articleService, SessionManager sessionManager) {
+        this.articleService = articleService;
         this.sessionManager = sessionManager;
     }
 
@@ -24,19 +24,19 @@ public class PostCreateHandler extends DynamicHandler {
         String sid = request.getSid();
         int authorId = sessionManager.getUser(sid).getId();
 
-        Post post = createPost(request, authorId);
-        postService.create(post);
+        Article article = createArticle(request, authorId);
+        articleService.create(article);
         return new ModelAndView("redirect:/index.html");
     }
 
-    private Post createPost(HTTPRequest request, int authorId) {
+    private Article createArticle(HTTPRequest request, int authorId) {
         Map<String, String> bodyParams = request.getBodyParams();
         if(!isValidCreateParams(bodyParams)) {
             throw BadRequestException.missingParameters();
         }
 
-        Post post = new Post(bodyParams.get("content"), authorId);
-        return post;
+        Article article = new Article(bodyParams.get("content"), authorId);
+        return article;
     }
 
     private boolean isValidCreateParams(Map<String, String> qp) {

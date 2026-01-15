@@ -2,18 +2,18 @@ package application.model;
 
 import java.time.LocalDateTime;
 
-public class Post {
+public class Article {
     private Integer id;
     private String content;
     private int authorId;
     private LocalDateTime createdAt;
 
-    public Post(String content, int authorId) {
+    public Article(String content, int authorId) {
         this.content = content;
         this.authorId = authorId;
     }
 
-    public Post(Integer id, String content, int authorId, LocalDateTime createdAt) {
+    public Article(Integer id, String content, int authorId, LocalDateTime createdAt) {
         this.id = id;
         this.content = content;
         this.authorId = authorId;

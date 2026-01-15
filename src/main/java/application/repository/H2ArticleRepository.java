@@ -1,20 +1,20 @@
 package application.repository;
 
-import application.model.Post;
+import application.model.Article;
 import config.DBConfig;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class H2PostRepository implements PostRepository {
-    public void addPost(Post post){
+public class H2ArticleRepository implements ArticleRepository {
+    public void addArticle(Article article){
         String sql = "INSERT INTO post(content, author_id) VALUES (?, ?)";
 
         try(Connection conn = DBConfig.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)){
-            pstmt.setString(1, post.getContent());
-            pstmt.setInt(2, post.getAuthorId());
+            pstmt.setString(1, article.getContent());
+            pstmt.setInt(2, article.getAuthorId());
 
             int affected = pstmt.executeUpdate();
             if (affected != 1) {
