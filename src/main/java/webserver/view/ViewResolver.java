@@ -30,7 +30,7 @@ public class ViewResolver {
             return new StaticView(Files.readAllBytes(Paths.get(staticPath)), contentType);
         }
 
-        throw NotFoundException.pageNotFound(viewName);
+        return null;
     }
 
     private static String resolvePath(String basePath, String path) {

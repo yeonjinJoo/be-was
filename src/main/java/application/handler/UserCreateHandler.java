@@ -34,7 +34,6 @@ public class UserCreateHandler extends DynamicHandler {
                 bodyParams.get("name"),
                 bodyParams.get("email"));
 
-        userService.create(user);
         return user;
     }
 

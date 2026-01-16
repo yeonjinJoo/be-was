@@ -9,6 +9,7 @@ import webserver.exception.webexception.ConflictException;
 import webserver.multipart.UploadedFile;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class UserService {
     private static final String LOGIN_PAGE = "/login";
@@ -25,7 +26,7 @@ public class UserService {
     public void create(User user) {
         validateLength(REGISTRATION_PAGE, user.getUserId(), user.getName(), user.getEmail(), user.getPassword());
 
-        JdbcTx.executeInTx(conn -> {
+        JdbcTx.execute(conn -> {
             if (userRepository.existsByUserId(conn, user.getUserId())) {
                 throw ConflictException.duplicateUserId(REGISTRATION_PAGE);
             }
@@ -82,6 +83,7 @@ public class UserService {
         }
 
         String savedFileName = null;
+        AtomicReference<String> oldImageUrl = new AtomicReference<>();
         try{
             if (image != null) {
                 savedFileName = imageStorage.save(image);
@@ -95,9 +97,9 @@ public class UserService {
                 }
 
                 User user = userRepository.findById(conn, id);
-                String oldImageUrl = user.getProfileImageUrl();
+                oldImageUrl.set(user.getProfileImageUrl());
 
-                String newImageUrl = oldImageUrl;
+                String newImageUrl = oldImageUrl.get();
 
                 if (deleteProfile) {
                     newImageUrl = null;
@@ -105,16 +107,16 @@ public class UserService {
                 if (finalSavedFileName != null) {
                     newImageUrl = "/img/uploads/" + finalSavedFileName;
                 }
-                System.out.println(newImageUrl);
 
                 userRepository.updateProfile(conn, id, newNm, newPw, hasImageChange, newImageUrl);
 
-                if ((deleteProfile || finalSavedFileName != null) && oldImageUrl != null) {
-                    imageStorage.deleteQuietly(extractFileName(oldImageUrl));
-                }
-
                 return userRepository.findById(conn, id);
             });
+
+            // 성공했다면 기존 이미지 삭제
+            if ((deleteProfile || finalSavedFileName != null) && oldImageUrl.get() != null) {
+                imageStorage.deleteQuietly(extractFileName(oldImageUrl.get()));
+            }
 
             return Optional.ofNullable(updated);
 

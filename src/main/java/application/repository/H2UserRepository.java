@@ -115,7 +115,6 @@ public class H2UserRepository implements UserRepository {
         if(changeProfileImage){
             if (!first) sql.append(", ");
             sql.append("profile_image_url = ?");
-            first = false;
         }
         sql.append(" WHERE id = ?");
 

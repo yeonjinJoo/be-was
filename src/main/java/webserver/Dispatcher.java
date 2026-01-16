@@ -3,6 +3,7 @@ package webserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.exception.httpexception.HTTPException;
+import webserver.exception.httpexception.NotFoundException;
 import webserver.exception.webexception.WebException;
 import webserver.http.HTTPMethod;
 import webserver.handler.Handler;
@@ -42,20 +43,21 @@ public class Dispatcher {
             Handler handler = handlerMapping.getProperHandler(method, path);
 
             ModelAndView modelAndView = handler.handle(request);
+            View view = ViewResolver.resolve(modelAndView.getViewName());
+            if (view == null) {throw NotFoundException.pageNotFound(modelAndView.getViewName());}
+            view.render(request.getVersion(), modelAndView.getModel(), modelAndView.getHeaders(), dos, writer);
 
             render(request.getVersion(), modelAndView, dos, writer);
 
-        } catch (WebException e){
+        } catch (WebException e) {
             logger.warn("Web Error Occurred: {} {}", e.getStatus(), e.getMessage());
             render(request.getVersion(), handleWebException(e), dos, writer);
-        } catch (HTTPException e){
+        } catch (HTTPException e) {
             logger.error("HTTP Error Occurred: {} {}", e.getStatus(), e.getMessage());
             render(request.getVersion(), handleHTTPException(e), dos, writer);
         } catch (Exception e){
-            // TODO: /error/500.html static file로 만들기
             logger.error("Internal System Error: ", e.getMessage());
             e.printStackTrace();
-            render(request.getVersion(), new ModelAndView("redirect:/error/500.html"), dos, writer);
         }
     }
 
